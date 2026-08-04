@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { products, site, storeUrl } from "../site.config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const updated = "2026-08-04";
+const updated = "2026-08-05";
 
 const copy = {
   en: {
@@ -24,7 +24,7 @@ const copy = {
     viewProduct: "Explore product",
     getPlay: "Get it on Google Play",
     screenshots: "Product screenshots",
-    features: "Built for focused work",
+    features: "Product features",
     faq: "Frequently asked questions",
     related: "Explore more Android tools",
     contact: "Contact support",
@@ -51,7 +51,7 @@ const copy = {
     viewProduct: "查看产品",
     getPlay: "前往 Google Play",
     screenshots: "产品截图",
-    features: "为专注工作而设计",
+    features: "功能介绍",
     faq: "常见问题",
     related: "探索更多 Android 工具",
     contact: "联系支持",
@@ -75,14 +75,28 @@ function jsonLd(data) {
   return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("<", "\\u003c")}</script>`;
 }
 
+function updatedLabel(locale) {
+  const date = new Date(`${updated}T00:00:00Z`);
+  if (locale === "zh") {
+    return `最后更新：${date.getUTCFullYear()} 年 ${date.getUTCMonth() + 1} 月 ${date.getUTCDate()} 日`;
+  }
+  return `Last updated: ${new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(date)}`;
+}
+
 function localizedPath(locale, type, slug = "") {
   const prefix = locale === "zh" ? "/zh-cn" : "";
   if (type === "home") return `${prefix}/`;
+  if (type === "products") return `${prefix}/products/`;
   if (type === "product") return `${prefix}/products/${slug}/`;
   return `${prefix}/${type}.html`;
 }
 
-function head({ locale, title, description, path, alternatePath, image, schemas = [], type = "website" }) {
+function localizedProductPagePath(locale, product, page) {
+  const prefix = locale === "zh" ? "/zh-cn" : "";
+  return `${prefix}/products/${product.slug}/${page}.html`;
+}
+
+function head({ locale, title, description, path, alternatePath, image, imageAlt = title, schemas = [], type = "website", robots = "index,follow,max-image-preview:large" }) {
   const c = copy[locale];
   const canonical = `${site.domain}${path}`;
   const alternate = `${site.domain}${alternatePath}`;
@@ -96,6 +110,8 @@ function head({ locale, title, description, path, alternatePath, image, schemas 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
+  <meta name="author" content="${esc(site.company[locale])}">
+  <meta name="robots" content="${robots}">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="${canonical}">
@@ -109,6 +125,8 @@ function head({ locale, title, description, path, alternatePath, image, schemas 
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${canonical}">
   <meta property="og:image" content="${socialImage}">
+  <meta property="og:image:alt" content="${esc(imageAlt)}">
+  <meta property="og:locale:alternate" content="${locale === "en" ? "zh_CN" : "en_US"}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(title)}">
   <meta name="twitter:description" content="${esc(description)}">
@@ -124,7 +142,7 @@ ${schemas.length ? `  ${schemas.map(jsonLd).join("\n  ")}\n` : ""}</head>`;
 function header(locale, active, alternatePath) {
   const c = copy[locale];
   const home = localizedPath(locale, "home");
-  const productHref = `${home}#products`;
+  const productHref = localizedPath(locale, "products");
   return `<body>
   <a class="skip-link" href="#main-content">${c.skip}</a>
   <header class="site-header" data-header>
@@ -165,7 +183,7 @@ function footer(locale) {
       </div>
       <nav aria-label="${locale === "zh" ? "页脚导航" : "Footer navigation"}">
         <ul class="footer-links">
-          <li><a href="${home}#products">${c.products}</a></li>
+          <li><a href="${localizedPath(locale, "products")}">${c.products}</a></li>
           <li><a href="${localizedPath(locale, "about")}">${c.about}</a></li>
           <li><a href="${localizedPath(locale, "privacy")}">${c.privacy}</a></li>
           <li><a href="${localizedPath(locale, "support")}">${c.support}</a></li>
@@ -185,13 +203,84 @@ function organizationSchema(locale) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: site.name,
+    "@id": `${site.domain}/#organization`,
+    name: site.company[locale],
+    alternateName: site.name,
     legalName: site.company[locale],
     url: site.domain,
     email: site.email,
+    logo: `${site.domain}/favicon.svg`,
     founder: { "@type": "Person", name: site.developer },
-    sameAs: products.map((product) => storeUrl(product, locale))
+    brand: { "@type": "Brand", name: site.name },
+    knowsAbout: [
+      "Android application development",
+      "field inspection software",
+      "photo metadata workflows",
+      "offline photo AI",
+      "mobile music libraries"
+    ],
+    contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: site.email, availableLanguage: ["en", "zh-CN"] }
   };
+}
+
+function websiteSchema(locale) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${site.domain}/#website`,
+    name: site.name,
+    alternateName: site.alternateName,
+    url: `${site.domain}${localizedPath(locale, "home")}`,
+    inLanguage: locale === "zh" ? "zh-CN" : "en",
+    publisher: { "@id": `${site.domain}/#organization` }
+  };
+}
+
+function breadcrumbSchema(locale, product) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: copy[locale].breadcrumbHome, item: `${site.domain}${localizedPath(locale, "home")}` },
+      { "@type": "ListItem", position: 2, name: copy[locale].breadcrumbProducts, item: `${site.domain}${localizedPath(locale, "products")}` },
+      { "@type": "ListItem", position: 3, name: product.name, item: `${site.domain}${localizedPath(locale, "product", product.slug)}` }
+    ]
+  };
+}
+
+function productsPage(locale) {
+  const isZh = locale === "zh";
+  const path = localizedPath(locale, "products");
+  const alternatePath = localizedPath(isZh ? "en" : "zh", "products");
+  const title = isZh
+    ? "Android 应用产品组合 | 上海促动科技有限公司 | FlowTools"
+    : "Android App Portfolio | Shanghai Cudong Technology | FlowTools";
+  const description = isZh
+    ? "浏览上海促动科技有限公司 FlowTools 产品组合：现场检查、照片元数据、现场摄影、离线 AI 和音乐管理 Android 应用。"
+    : "Explore FlowTools Android products from Shanghai Cudong Technology: site inspection, photo metadata, field photography, offline AI and music tools.";
+  const items = products.map((product, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: product.storeName,
+    url: `${site.domain}${localizedPath(locale, "product", product.slug)}`
+  }));
+  const cards = products.map((product) => {
+    const content = product[locale];
+    return `<article class="product-card">
+      <div class="product-card-top"><img class="app-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon" loading="lazy"><span class="availability">${isZh ? "已发布" : "Published"}</span></div>
+      <p class="product-category">${content.category}</p><h2>${product.name}</h2><p>${content.description}</p>
+      <ul class="tag-list" aria-label="${esc(product.name)} ${isZh ? "功能" : "features"}">${content.tags.map((tag) => `<li>${tag}</li>`).join("")}</ul>
+      <a class="text-action" href="${localizedPath(locale, "product", product.slug)}">${isZh ? "查看项目详情" : "View project details"}<span aria-hidden="true">→</span></a>
+    </article>`;
+  }).join("\n");
+  const collectionSchema = { "@context": "https://schema.org", "@type": "CollectionPage", name: title, description, url: `${site.domain}${path}`, isPartOf: { "@id": `${site.domain}/#website` }, publisher: { "@id": `${site.domain}/#organization` }, mainEntity: { "@type": "ItemList", itemListElement: items } };
+  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", imageAlt: isZh ? "FlowTools Android 应用产品组合" : "FlowTools Android app portfolio", schemas: [organizationSchema(locale), collectionSchema] })}
+${header(locale, "products", alternatePath)}
+  <main class="page-main" id="main-content">
+    ${pageIntro(locale, isZh ? "产品组合" : "Product portfolio", isZh ? "为具体工作场景打造的 Android 产品。" : "Android products for specific situations.", isZh ? "从现场检查到照片工作流，了解 FlowTools 的完整产品组合。" : "Explore the complete FlowTools portfolio, from field inspection to photo workflows.")}
+    <section class="section products-section"><div class="container"><div class="product-grid">${cards}</div></div></section>
+  </main>
+${footer(locale)}`;
 }
 
 function homePage(locale) {
@@ -200,11 +289,11 @@ function homePage(locale) {
   const path = localizedPath(locale, "home");
   const alternatePath = localizedPath(isZh ? "en" : "zh", "home");
   const title = isZh
-    ? "FlowTools | 专业实用的 Android 软件"
-    : "FlowTools | Practical Android Apps for Real Work";
+    ? "上海促动科技有限公司 | Android 产品工作室 | FlowTools"
+    : "Shanghai Cudong Technology | Android Product Studio | FlowTools";
   const description = isZh
-    ? "FlowTools 由上海屹和科技有限公司打造，提供照片元数据、现场检查、离线 AI、现场摄影和音乐管理等 Android 应用。"
-    : "FlowTools builds practical Android apps for photo metadata, field inspection, offline AI, field photography and music libraries.";
+    ? "上海促动科技有限公司旗下 FlowTools 产品工作室，打造现场检查、照片工作流、离线 AI、音乐管理等实用 Android 应用。"
+    : "FlowTools is the Android product studio of Shanghai Cudong Technology, building practical apps for field inspection, photo workflows, offline AI and music libraries.";
   const listSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -216,7 +305,22 @@ function homePage(locale) {
       name: product.storeName
     }))
   };
-  const cards = products.map((product) => {
+  const featuredProduct = products.find((product) => product.featured) || products[0];
+  const featuredContent = featuredProduct[locale];
+  const featuredFeatures = featuredContent.features.slice(0, 3).map(([name, text], index) => `<li><span>${String(index + 1).padStart(2, "0")}</span><div><strong>${name}</strong><p>${text}</p></div></li>`).join("");
+  const studioFaq = isZh ? [
+    ["上海促动科技有限公司做什么？", "上海促动科技有限公司是一家 Android 产品工作室，通过 FlowTools 品牌开发和维护面向现场工作、摄影、媒体与效率场景的实用软件。"],
+    ["FlowTools 有哪些产品？", "FlowTools 目前包含 SiteReport、CaptionMeta、GeoLens、Pixora 和 Cloud Music，分别面向现场检查、照片元数据、现场摄影、离线照片 AI 和音乐管理。"],
+    ["这些应用适合谁使用？", "产品面向需要清晰移动工作流的专业人员、现场团队、摄影工作者以及希望在本地处理媒体内容的 Android 用户。"],
+    ["在哪里可以获取 FlowTools 应用？", "各个产品页面都提供 Google Play 入口。具体功能、权限和数据处理方式以对应产品页面及 Google Play 说明为准。"]
+  ] : [
+    ["What does Shanghai Cudong Technology do?", "Shanghai Cudong Technology is an Android product studio that builds and maintains practical software for field work, photography, media and productivity through the FlowTools brand."],
+    ["What products are in FlowTools?", "FlowTools currently includes SiteReport, CaptionMeta, GeoLens, Pixora and Cloud Music for site inspection, photo metadata, field photography, offline photo AI and music management."],
+    ["Who are these products for?", "The products are for professionals, field teams, photographers and Android users who need clear mobile workflows and local control over media content."],
+    ["Where can I get FlowTools apps?", "Each product page provides a Google Play link. Check the relevant product page and Google Play listing for current features, permissions and data practices."]
+  ];
+  const studioFaqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: studioFaq.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) };
+  const cards = products.filter((product) => product !== featuredProduct).map((product) => {
     const content = product[locale];
     return `<article class="product-card">
       <div class="product-card-top">
@@ -230,29 +334,53 @@ function homePage(locale) {
       <a class="text-action" href="${localizedPath(locale, "product", product.slug)}">${c.viewProduct}<span aria-hidden="true">→</span></a>
     </article>`;
   }).join("\n");
-  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [organizationSchema(locale), listSchema] })}
+  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", imageAlt: isZh ? "FlowTools Android 产品工作室" : "FlowTools Android product studio", schemas: [organizationSchema(locale), websiteSchema(locale), listSchema, studioFaqSchema] })}
 ${header(locale, "home", alternatePath)}
   <main id="main-content">
     <section class="home-hero" aria-labelledby="home-title">
-      <div class="hero-media" aria-hidden="true">
-        <img class="hero-shot hero-shot-one" src="/assets/apps/captionmeta/screen-1.webp" width="592" height="1052" alt="">
-        <img class="hero-shot hero-shot-two" src="/assets/apps/sitereport/screen-1.webp" width="592" height="1052" alt="">
-        <img class="hero-shot hero-shot-three" src="/assets/apps/pixora/screen-1.webp" width="592" height="1052" alt="">
-      </div>
       <div class="container hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow">${isZh ? "Android 应用工作室" : "Independent Android studio"}</p>
-          <h1 id="home-title">${isZh ? "FlowTools，专注实用的 Android 软件" : "FlowTools for Android"}</h1>
-          <p>${isZh ? "从照片元数据与现场检查，到离线 AI 和音乐管理。我们打造目标清晰、尊重隐私、真正解决问题的移动工具。" : "From photo metadata and site inspections to offline AI and music libraries. Focused mobile tools that solve a clear problem and respect your work."}</p>
+          <p class="eyebrow">${isZh ? "上海促动科技 · 产品工作室" : "Shanghai Cudong Technology · Product studio"}</p>
+          <h1 id="home-title">${isZh ? "为真实工作，打造更好的软件。" : "Software for real-world work."}</h1>
+          <p>${isZh ? "我们设计、开发并持续维护面向现场工作、摄影、媒体和效率场景的 Android 产品。少一点复杂，多一点真正有用。" : "We design, build and maintain Android products for field work, photography, media and everyday productivity. Less complexity. More of what is genuinely useful."}</p>
           <div class="button-row">
-            <a class="button button-primary" href="#products">${isZh ? "浏览全部应用" : "Browse all apps"}</a>
-            <a class="button button-ghost" href="${localizedPath(locale, "about")}">${isZh ? "了解开发团队" : "Meet the studio"}</a>
+            <a class="button button-primary" href="#work">${isZh ? "查看我们的产品" : "Explore our work"}<span aria-hidden="true">→</span></a>
+            <a class="button button-ghost" href="${localizedPath(locale, "about")}">${isZh ? "了解公司" : "About the studio"}</a>
           </div>
-          <div class="hero-facts" aria-label="${isZh ? "产品特点" : "Product highlights"}">
-            <span>5 ${isZh ? "款已确认应用" : "published apps"}</span>
-            <span>${isZh ? "Android 原生" : "Android native"}</span>
-            <span>${isZh ? "独立开发" : "Independently built"}</span>
+          <p class="hero-meta">${isZh ? "5 款已发布产品 · Android 原生 · 持续维护" : "5 published products · Android native · Actively maintained"}</p>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-glow" aria-hidden="true"></div>
+          <div class="hero-gallery">
+            <img class="hero-gallery-main" src="${featuredProduct.screenshots[1] || featuredProduct.screenshots[0]}" width="592" height="1052" alt="${esc(featuredProduct.name)} app interface" fetchpriority="high">
+            <img class="hero-gallery-secondary" src="${featuredProduct.screenshots[2] || featuredProduct.screenshots[0]}" width="592" height="1052" alt="" loading="lazy">
           </div>
+          <div class="hero-visual-caption"><strong>${featuredProduct.name}</strong><span>${isZh ? "重点项目 · " : "Selected work · "}${featuredContent.category}</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="studio-stats" aria-label="${isZh ? "工作室概览" : "Studio overview"}">
+      <div class="container studio-stats-grid">
+        <div><strong>01</strong><span>${isZh ? "从真实问题出发" : "Start with a real problem"}</span></div>
+        <div><strong>05</strong><span>${isZh ? "已发布 Android 产品" : "Published Android products"}</span></div>
+        <div><strong>01</strong><span>${isZh ? "独立、持续负责的团队" : "Independent team, end to end"}</span></div>
+      </div>
+    </section>
+
+    <section class="section featured-project" id="work" aria-labelledby="featured-project-title">
+      <div class="container featured-project-layout">
+        <div class="featured-project-media">
+          <img src="${featuredProduct.screenshots[0]}" width="592" height="1052" alt="${esc(featuredProduct.name)} app interface" loading="lazy">
+          <span class="featured-project-badge">${isZh ? "重点项目" : "Featured project"}</span>
+        </div>
+        <div class="featured-project-copy">
+          <p class="eyebrow">${isZh ? "精选项目 · 01" : "Selected work · 01"}</p>
+          <h2 id="featured-project-title">${featuredProduct.name}</h2>
+          <p class="featured-project-tagline">${featuredContent.tagline}</p>
+          <p>${featuredContent.description}</p>
+          <ul class="featured-project-features">${featuredFeatures}</ul>
+          <a class="button button-primary" href="${localizedPath(locale, "product", featuredProduct.slug)}">${isZh ? "查看完整案例" : "Read the full case"}<span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -260,8 +388,8 @@ ${header(locale, "home", alternatePath)}
     <section class="section products-section" id="products" aria-labelledby="products-title">
       <div class="container">
         <div class="section-heading heading-row">
-          <div><p class="eyebrow">${c.products}</p><h2 id="products-title">${isZh ? "每一款应用，只解决真正重要的问题。" : "One focused job. Done properly."}</h2></div>
-          <p>${isZh ? "覆盖摄影、现场工作、离线 AI 与个人媒体管理，所有应用均面向 Android。" : "A growing collection for photography, field work, offline AI and personal media, built specifically for Android."}</p>
+          <div><p class="eyebrow">${isZh ? "产品组合" : "Product portfolio"}</p><h2 id="products-title">${isZh ? "不同场景，同一种产品坚持。" : "Different needs. The same product discipline."}</h2></div>
+          <p>${isZh ? "从照片元数据到离线 AI，我们为每一个具体场景打造清晰、可靠、可以真正投入使用的 Android 工具。" : "From photo metadata to offline AI, we build clear and dependable Android tools for specific situations and real use."}</p>
         </div>
         <div class="product-grid">${cards}</div>
       </div>
@@ -278,6 +406,10 @@ ${header(locale, "home", alternatePath)}
       </div>
     </section>
 
+    <section class="section faq-section studio-faq" aria-labelledby="studio-faq-title">
+      <div class="container faq-layout"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="studio-faq-title">${isZh ? "关于上海促动科技与 FlowTools" : "About Shanghai Cudong Technology and FlowTools"}</h2></div><div class="faq-list">${studioFaq.map(([question, answer]) => `<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></div>
+    </section>
+
     <section class="company-band" aria-labelledby="company-title">
       <div class="container company-layout">
         <div><p class="eyebrow">${isZh ? "开发团队" : "The studio"}</p><h2 id="company-title">${site.company[locale]}</h2></div>
@@ -292,7 +424,7 @@ function breadcrumb(locale, product) {
   const c = copy[locale];
   return `<nav class="breadcrumb" aria-label="${locale === "zh" ? "面包屑" : "Breadcrumb"}">
     <a href="${localizedPath(locale, "home")}">${c.breadcrumbHome}</a><span aria-hidden="true">/</span>
-    <a href="${localizedPath(locale, "home")}#products">${c.breadcrumbProducts}</a><span aria-hidden="true">/</span>
+    <a href="${localizedPath(locale, "products")}">${c.breadcrumbProducts}</a><span aria-hidden="true">/</span>
     <span aria-current="page">${product.name}</span>
   </nav>`;
 }
@@ -310,12 +442,15 @@ function productPage(locale, product) {
     name: product.storeName,
     description: content.description,
     operatingSystem: "Android",
-    applicationCategory: content.category,
+    applicationCategory: product.schemaCategory,
+    applicationSubCategory: content.category,
+    featureList: content.features.map(([name]) => name),
+    keywords: [...content.tags, content.category, "Android"].join(", "),
     url: `${site.domain}${path}`,
     downloadUrl: storeUrl(product, locale),
     image: `${site.domain}${product.icon}`,
     screenshot: product.screenshots.map((image) => `${site.domain}${image}`),
-    publisher: { "@type": "Organization", name: site.name, legalName: site.company[locale], url: site.domain }
+    publisher: { "@id": `${site.domain}/#organization` }
   };
   const faqSchema = {
     "@context": "https://schema.org",
@@ -330,7 +465,7 @@ function productPage(locale, product) {
   const features = content.features.map(([name, text], index) => `<article class="feature-item"><span>${String(index + 1).padStart(2, "0")}</span><h3>${name}</h3><p>${text}</p></article>`).join("");
   const faqs = content.faq.map(([question, answer]) => `<details><summary>${question}</summary><p>${answer}</p></details>`).join("");
   const related = products.filter((item) => item.slug !== product.slug).slice(0, 3).map((item) => `<a class="related-product" href="${localizedPath(locale, "product", item.slug)}"><img src="${item.icon}" width="512" height="512" alt="" loading="lazy"><span><strong>${item.name}</strong><small>${item[locale].category}</small></span><span aria-hidden="true">→</span></a>`).join("");
-  return `${head({ locale, title, description: content.description, path, alternatePath, image: `/assets/social/${product.slug}.png`, schemas: [schema, faqSchema], type: "product" })}
+  return `${head({ locale, title, description: content.description, path, alternatePath, image: `/assets/social/${product.slug}.png`, imageAlt: `${product.name} Android app`, schemas: [schema, faqSchema, breadcrumbSchema(locale, product)], type: "product" })}
 ${header(locale, "products", alternatePath)}
   <main id="main-content">
     <section class="product-hero" aria-labelledby="product-title">
@@ -375,18 +510,96 @@ function pageIntro(locale, eyebrow, title, description) {
   return `<header class="page-intro"><div class="container page-intro-inner"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${description}</p></div></header>`;
 }
 
+function productPolicyPage(locale, product) {
+  const isZh = locale === "zh";
+  const content = product[locale];
+  const page = "privacy";
+  const path = localizedProductPagePath(locale, product, page);
+  const alternatePath = localizedProductPagePath(isZh ? "en" : "zh", product, page);
+  const title = `${product.name} ${isZh ? "隐私政策" : "Privacy Policy"} | FlowTools`;
+  const description = isZh ? `了解 ${product.name} 如何处理照片、媒体、位置和应用数据。` : `Learn how ${product.name} handles photos, media, location and app data.`;
+  const sections = isZh ? [
+    ["scope", "适用范围", `本页面适用于 ${product.name} Android 应用及其相关功能。不同版本的实际权限和数据处理方式，以应用内提示及 Google Play 数据安全说明为准。`],
+    ["data", "应用数据", `为了提供${content.category}功能，应用可能处理你主动选择的照片、媒体、项目记录、元数据、位置上下文或导出内容。应用不会把这些内容用于广告画像。`],
+    ["permissions", "设备权限", "应用只在相关功能需要时请求相机、照片和媒体、音频、存储或位置权限。你可以在 Android 系统设置中拒绝或撤销权限；对应功能可能因此不可用。"],
+    ["network", "网络与分享", "当你主动使用上传、分享、云端来源或导出功能时，内容可能发送到你选择或配置的服务。未主动触发时，应用不会为了广告目的上传你的内容。"],
+    ["deletion", "删除与联系", `本地数据通常保留在设备上，直到你在应用中删除、清除应用数据或卸载应用。如有隐私问题，请发送邮件至 <a href="mailto:${site.email}">${site.email}</a> 并注明 ${product.name}。`]
+  ] : [
+    ["scope", "Scope", `This page applies to the ${product.name} Android app and its related features. Actual permissions and data practices may vary by version; the in-app notice and Google Play Data safety disclosure also apply.`],
+    ["data", "App data", `To provide its ${content.category} features, the app may process photos, media, project records, metadata, location context or exports that you actively select. We do not use this content to build advertising profiles.`],
+    ["permissions", "Device permissions", "The app requests camera, photos and media, audio, storage or location access only when a related feature needs it. You can deny or revoke access in Android settings; the related feature may then be unavailable."],
+    ["network", "Network and sharing", "When you actively use uploads, sharing, cloud sources or exports, content may be sent to a service you select or configure. The app does not upload your content for advertising purposes when you have not initiated such a feature."],
+    ["deletion", "Deletion and contact", `Local data normally remains on your device until you delete it, clear app data or uninstall the app. For privacy questions, email <a href="mailto:${site.email}">${site.email}</a> and name ${product.name}.`]
+  ];
+  return `${head({ locale, title, description, path, alternatePath, image: product.icon, robots: "noindex,follow", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: updated }] })}
+${header(locale, "products", alternatePath)}
+  <main class="page-main" id="main-content">
+    ${pageIntro(locale, isZh ? "项目协议" : "Project policy", isZh ? `${product.name} 隐私政策` : `${product.name} privacy policy`, updatedLabel(locale))}
+    <div class="container section legal-layout"><aside class="legal-nav" aria-label="${isZh ? "隐私政策章节" : "Privacy policy sections"}"><strong>${isZh ? "本页内容" : "On this page"}</strong>${sections.map(([id, name]) => `<a href="#${id}">${name}</a>`).join("")}</aside><article class="prose legal-copy">${sections.map(([id, name, text]) => `<section id="${id}"><h2>${name}</h2><p>${text}</p></section>`).join("")}</article></div>
+  </main>
+${footer(locale)}`;
+}
+
+function productTermsPage(locale, product) {
+  const isZh = locale === "zh";
+  const page = "terms";
+  const path = localizedProductPagePath(locale, product, page);
+  const alternatePath = localizedProductPagePath(isZh ? "en" : "zh", product, page);
+  const title = `${product.name} ${isZh ? "使用条款" : "Terms of Use"} | FlowTools`;
+  const description = isZh ? `使用 ${product.name} Android 应用前需要了解的条款。` : `Terms that apply when using the ${product.name} Android app.`;
+  const sections = isZh ? [
+    ["use", "合理使用", `你可以在拥有或获授权的 Android 设备上使用 ${product.name}。请遵守适用法律、Google Play 规则以及你所在地区对照片、位置和媒体内容的要求。`],
+    ["content", "你的内容", "你对使用应用处理、导入、上传或分享的照片、文件、文字和其他内容负责。请确认你拥有必要的权利，并在分享他人信息时取得适当授权。"],
+    ["network", "第三方服务", "Google Play、云端音乐来源、服务器、地图或其他第三方服务可能有自己的条款和隐私政策。使用这些功能时，你也需要遵守相关服务的规则。"],
+    ["availability", "功能与更新", "应用功能可能随版本更新而调整。我们会尽量保持产品稳定，但不承诺每项功能在所有设备、系统版本或网络环境中始终可用。"],
+    ["contact", "联系我们", `如需反馈、支持或说明问题，请发送邮件至 <a href="mailto:${site.email}">${site.email}</a>，并注明 ${product.name}。`]
+  ] : [
+    ["use", "Acceptable use", `You may use ${product.name} on an Android device that you own or are authorized to use. Follow applicable law, Google Play rules and local requirements for photos, location and media content.`],
+    ["content", "Your content", "You are responsible for photos, files, text and other content that you process, import, upload or share through the app. Make sure you have the necessary rights and permissions when sharing other people's information."],
+    ["network", "Third-party services", "Google Play, cloud music sources, servers, maps and other third-party services may have their own terms and privacy policies. You must follow those rules when using related features."],
+    ["availability", "Features and updates", "Features may change as the app is updated. We work to keep the product stable, but cannot promise that every feature will be available on every device, system version or network."],
+    ["contact", "Contact", `For feedback, support or product questions, email <a href="mailto:${site.email}">${site.email}</a> and name ${product.name}.`]
+  ];
+  return `${head({ locale, title, description, path, alternatePath, image: product.icon, robots: "noindex,follow", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: updated }] })}
+${header(locale, "products", alternatePath)}
+  <main class="page-main" id="main-content">
+    ${pageIntro(locale, isZh ? "项目协议" : "Project terms", isZh ? `${product.name} 使用条款` : `${product.name} terms of use`, updatedLabel(locale))}
+    <div class="container section legal-layout"><aside class="legal-nav" aria-label="${isZh ? "使用条款章节" : "Terms sections"}"><strong>${isZh ? "本页内容" : "On this page"}</strong>${sections.map(([id, name]) => `<a href="#${id}">${name}</a>`).join("")}</aside><article class="prose legal-copy">${sections.map(([id, name, text]) => `<section id="${id}"><h2>${name}</h2><p>${text}</p></section>`).join("")}</article></div>
+  </main>
+${footer(locale)}`;
+}
+
+function productActivityPage(locale, product) {
+  const isZh = locale === "zh";
+  const content = product[locale];
+  const page = "activity";
+  const path = localizedProductPagePath(locale, product, page);
+  const alternatePath = localizedProductPagePath(isZh ? "en" : "zh", product, page);
+  const title = `${product.name} ${isZh ? "产品活动" : "Product activity"} | FlowTools`;
+  const description = isZh ? `${product.name} 的项目介绍、功能亮点和最新产品动态。` : `Product highlights, feature notes and updates for ${product.name}.`;
+  const highlights = content.features.map(([name, text], index) => `<article class="feature-item"><span>${String(index + 1).padStart(2, "0")}</span><h3>${name}</h3><p>${text}</p></article>`).join("");
+  return `${head({ locale, title, description, path, alternatePath, image: `/assets/social/${product.slug}.png`, robots: "noindex,follow", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: updated }] })}
+${header(locale, "products", alternatePath)}
+  <main id="main-content">
+    <section class="product-hero activity-hero" aria-labelledby="activity-title"><div class="container product-hero-inner"><div class="product-identity"><img class="product-hero-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon"><div><p class="eyebrow">${isZh ? "产品活动页" : "Product activity"}</p><h1 id="activity-title">${product.name}</h1><p class="product-tagline">${content.tagline}</p><p class="product-description">${content.description}</p><div class="button-row"><a class="button button-primary" href="${storeUrl(product, locale)}" target="_blank" rel="noopener">${copy[locale].getPlay}<span aria-hidden="true">↗</span></a><a class="button button-ghost" href="${localizedPath(locale, "product", product.slug)}">${isZh ? "返回项目详情" : "Back to project"}</a></div></div></div></div></section>
+    <section class="section feature-section" aria-labelledby="activity-features-title"><div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "功能亮点" : "Feature highlights"}</p><h2 id="activity-features-title">${isZh ? "为真实场景而设计" : "Built for real situations"}</h2></div><div class="feature-grid">${highlights}</div></div></section>
+  </main>
+${footer(locale)}`;
+}
+
 function aboutPage(locale) {
   const isZh = locale === "zh";
   const path = localizedPath(locale, "about");
   const alternatePath = localizedPath(isZh ? "en" : "zh", "about");
   const title = isZh ? "关于 FlowTools | AndroidManTou" : "About FlowTools | AndroidManTou";
-  const description = isZh ? "了解 FlowTools、AndroidManTou 与上海屹和科技有限公司。" : "Learn about FlowTools, AndroidManTou and Shanghai Yihe Technology Co., Ltd.";
+  const description = isZh ? "了解 FlowTools、AndroidManTou 与上海促动科技有限公司。" : "Learn about FlowTools, AndroidManTou and Shanghai Cudong Technology Co., Ltd.";
   const schema = { "@context": "https://schema.org", "@type": "AboutPage", name: title, url: `${site.domain}${path}`, about: organizationSchema(locale) };
   return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [schema] })}
 ${header(locale, "about", alternatePath)}
   <main class="page-main" id="main-content">
     ${pageIntro(locale, isZh ? "关于我们" : "About", isZh ? "独立开发，认真解决真实问题。" : "Independent software for real-world work.", isZh ? "FlowTools 是 AndroidManTou 打造的 Android 软件品牌。" : "FlowTools is the Android software brand built by AndroidManTou.")}
-    <section class="section"><div class="container about-layout"><div><p class="eyebrow">${isZh ? "我们的方向" : "What we build"}</p><h2>${isZh ? "面向专业工作与日常使用的 Android 工具。" : "Android tools for professional workflows and everyday use."}</h2></div><div class="prose"><p>${isZh ? "我们关注照片元数据、现场检查、现场摄影、离线 AI 和个人媒体管理等具体场景。每款应用都围绕明确的问题展开，并尽可能减少不必要的复杂度。" : "We focus on concrete needs across photo metadata, site inspection, field photography, offline AI and personal media. Each app starts with a defined problem and removes unnecessary complexity."}</p><p>${isZh ? "FlowTools 由上海屹和科技有限公司运营，Google Play 开发者名称为 AndroidManTou。" : "FlowTools is operated by Shanghai Yihe Technology Co., Ltd. and publishes on Google Play under the developer name AndroidManTou."}</p></div></div></section>
+    <section class="section"><div class="container about-layout"><div><p class="eyebrow">${isZh ? "我们的方向" : "What we build"}</p><h2>${isZh ? "面向专业工作与日常使用的 Android 工具。" : "Android tools for professional workflows and everyday use."}</h2></div><div class="prose"><p>${isZh ? "我们关注照片元数据、现场检查、现场摄影、离线 AI 和个人媒体管理等具体场景。每款应用都围绕明确的问题展开，并尽可能减少不必要的复杂度。" : "We focus on concrete needs across photo metadata, site inspection, field photography, offline AI and personal media. Each app starts with a defined problem and removes unnecessary complexity."}</p><p>${isZh ? "FlowTools 由上海促动科技有限公司运营，Google Play 开发者名称为 AndroidManTou。" : "FlowTools is operated by Shanghai Cudong Technology Co., Ltd. and publishes on Google Play under the developer name AndroidManTou."}</p></div></div></section>
+    <section class="section principles" aria-labelledby="process-title"><div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "我们的方式" : "How we work"}</p><h2 id="process-title">${isZh ? "从问题到可交付的产品。" : "From a real problem to a product people can use."}</h2></div><div class="principle-grid"><article><span>01</span><h3>${isZh ? "理解场景" : "Understand the situation"}</h3><p>${isZh ? "先明确用户在什么环境下工作、哪里浪费时间，以及什么结果才算完成。" : "We start with the environment, the friction and the outcome that actually matters."}</p></article><article><span>02</span><h3>${isZh ? "减少复杂度" : "Remove the noise"}</h3><p>${isZh ? "只保留能推动工作向前的功能，让产品在现场也足够清楚。" : "We keep the features that move the work forward and remove everything that gets in the way."}</p></article><article><span>03</span><h3>${isZh ? "持续维护" : "Keep improving"}</h3><p>${isZh ? "产品发布不是终点，我们根据真实使用持续修正和改进。" : "Shipping is not the finish line. Real use guides the next improvement."}</p></article></div></div></section>
     <section class="company-band"><div class="container company-layout"><div><p class="eyebrow">${isZh ? "公司主体" : "Company"}</p><h2>${site.company[locale]}</h2></div><div><dl class="identity-list"><div><dt>${isZh ? "品牌" : "Brand"}</dt><dd>FlowTools</dd></div><div><dt>${isZh ? "开发者" : "Developer"}</dt><dd>${site.developer}</dd></div><div><dt>${isZh ? "地区" : "Region"}</dt><dd>${isZh ? "中国" : "China"}</dd></div><div><dt>${isZh ? "联系" : "Contact"}</dt><dd><a href="mailto:${site.email}">${site.email}</a></dd></div></dl></div></div></section>
   </main>
 ${footer(locale)}`;
@@ -416,7 +629,7 @@ function privacyPage(locale) {
   const description = isZh ? "了解 FlowTools Android 应用如何处理照片、媒体、位置、检查记录和诊断信息。" : "Learn how FlowTools Android apps handle photos, media, location, inspection records and diagnostic information.";
   const labels = isZh ? ["原则", "应用数据", "权限", "网络与分享", "保留与删除", "儿童隐私", "变更", "联系"] : ["Principles", "App data", "Permissions", "Network and sharing", "Retention and deletion", "Children", "Changes", "Contact"];
   const sections = isZh ? [
-    ["principles", "我们的原则", "FlowTools 由上海屹和科技有限公司运营。我们不会出售个人信息，也不会把你在应用中处理的内容用于广告画像。应用会尽可能减少不必要的数据传输，并在适合的功能中优先采用本地处理。"],
+    ["principles", "我们的原则", "FlowTools 由上海促动科技有限公司运营。我们不会出售个人信息，也不会把你在应用中处理的内容用于广告画像。应用会尽可能减少不必要的数据传输，并在适合的功能中优先采用本地处理。"],
     ["data", "应用数据", "不同产品处理的数据取决于其功能，可能包括你选择的照片、音频文件、IPTC/EXIF/XMP 元数据、检查清单、报告内容、位置上下文或导出文件。具体处理行为应同时以相应应用的 Google Play“数据安全”说明和应用内提示为准。"],
     ["permissions", "设备权限", "应用仅在功能需要时请求 Android 权限。这可能包括相机、用户选择的照片和媒体、音频文件、存储空间或位置。拒绝或撤销权限可能会让相应功能无法工作，但不会影响不依赖该权限的功能。"],
     ["network", "网络、上传与分享", "当你主动使用上传、云端音乐、分享或导出功能时，相关内容可能发送到你选择或配置的服务。GeoLens 的服务器上传、SiteReport 的报告分享以及 Cloud Music 的网络来源都由用户主动触发；第三方服务的数据处理同时受其自身政策约束。"],
@@ -425,7 +638,7 @@ function privacyPage(locale) {
     ["changes", "政策变更", "当产品功能、法律要求或数据实践发生变化时，我们可能更新本政策。页面顶部的日期表示当前版本。"],
     ["contact", "联系我们", `隐私问题或数据请求请发送邮件至 <a href="mailto:${site.email}">${site.email}</a>，并注明涉及的 FlowTools 产品。`]
   ] : [
-    ["principles", "Our principles", "FlowTools is operated by Shanghai Yihe Technology Co., Ltd. We do not sell personal information or use content processed in our apps to build advertising profiles. Our apps minimize unnecessary transfers and prefer local processing where the feature allows it."],
+    ["principles", "Our principles", "FlowTools is operated by Shanghai Cudong Technology Co., Ltd. We do not sell personal information or use content processed in our apps to build advertising profiles. Our apps minimize unnecessary transfers and prefer local processing where the feature allows it."],
     ["data", "App data", "The data handled by each product depends on its function and may include photos you select, audio files, IPTC/EXIF/XMP metadata, inspection records, report content, location context or exported files. The relevant Google Play Data safety disclosure and in-app notice also apply to each app."],
     ["permissions", "Device permissions", "Apps request Android permissions only when a feature needs them. These may include the camera, user-selected photos and media, audio files, storage or location. Refusing or revoking permission may disable the related feature without affecting features that do not depend on it."],
     ["network", "Network, uploads and sharing", "When you actively use upload, cloud music, sharing or export features, related content may be sent to a service you select or configure. GeoLens server uploads, SiteReport report sharing and Cloud Music network sources are user-initiated. Third-party services process data under their own policies."],
@@ -437,7 +650,7 @@ function privacyPage(locale) {
   return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: updated }] })}
 ${header(locale, "", alternatePath)}
   <main class="page-main" id="main-content">
-    ${pageIntro(locale, isZh ? "隐私" : "Privacy", isZh ? "清楚说明数据如何参与工作。" : "Clear about how data supports the work.", isZh ? "最后更新：2026 年 8 月 4 日" : "Last updated: August 4, 2026")}
+    ${pageIntro(locale, isZh ? "隐私" : "Privacy", isZh ? "清楚说明数据如何参与工作。" : "Clear about how data supports the work.", updatedLabel(locale))}
     <div class="container section legal-layout"><aside class="legal-nav" aria-label="${isZh ? "隐私政策章节" : "Privacy policy sections"}"><strong>${isZh ? "本页内容" : "On this page"}</strong>${sections.map((section, index) => `<a href="#${section[0]}">${labels[index]}</a>`).join("")}</aside><article class="prose legal-copy">${sections.map(([id, name, text]) => `<section id="${id}"><h2>${name}</h2><p>${text}</p></section>`).join("")}</article></div>
   </main>
 ${footer(locale)}`;
@@ -464,6 +677,8 @@ async function output(relativePath, content) {
 const pages = [
   ["index.html", homePage("en")],
   ["zh-cn/index.html", homePage("zh")],
+  ["products/index.html", productsPage("en")],
+  ["zh-cn/products/index.html", productsPage("zh")],
   ["about.html", aboutPage("en")],
   ["zh-cn/about.html", aboutPage("zh")],
   ["support.html", supportPage("en")],
@@ -476,12 +691,18 @@ const pages = [
 
 for (const product of products) {
   pages.push([`products/${product.slug}/index.html`, productPage("en", product)]);
+  pages.push([`products/${product.slug}/privacy.html`, productPolicyPage("en", product)]);
+  pages.push([`products/${product.slug}/terms.html`, productTermsPage("en", product)]);
+  pages.push([`products/${product.slug}/activity.html`, productActivityPage("en", product)]);
   pages.push([`zh-cn/products/${product.slug}/index.html`, productPage("zh", product)]);
+  pages.push([`zh-cn/products/${product.slug}/privacy.html`, productPolicyPage("zh", product)]);
+  pages.push([`zh-cn/products/${product.slug}/terms.html`, productTermsPage("zh", product)]);
+  pages.push([`zh-cn/products/${product.slug}/activity.html`, productActivityPage("zh", product)]);
 }
 
 for (const [path, content] of pages) await output(path, content);
 
-const sitemapPaths = ["home", "about", "support", "privacy"];
+const sitemapPaths = ["home", "products", "about", "support", "privacy"];
 const sitemapEntries = sitemapPaths.map((type) => [localizedPath("en", type), localizedPath("zh", type)]);
 for (const product of products) sitemapEntries.push([localizedPath("en", "product", product.slug), localizedPath("zh", "product", product.slug)]);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

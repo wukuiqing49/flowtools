@@ -1,17 +1,19 @@
 export const site = {
   name: "FlowTools",
+  alternateName: "上海促动科技有限公司",
   domain: "https://flowtools.app",
   email: "wukuiqing@gmail.com",
   developer: "AndroidManTou",
   company: {
-    en: "Shanghai Yihe Technology Co., Ltd.",
-    zh: "上海屹和科技有限公司"
+    en: "Shanghai Cudong Technology Co., Ltd.",
+    zh: "上海促动科技有限公司"
   }
 };
 
 export const products = [
   {
     slug: "captionmeta",
+    schemaCategory: "PhotographyApplication",
     name: "CaptionMeta",
     storeName: "CaptionMeta: IPTC Metadata",
     packageName: "com.wkq.caption",
@@ -58,6 +60,7 @@ export const products = [
   },
   {
     slug: "cloud-music",
+    schemaCategory: "MusicApplication",
     name: "Cloud Music",
     storeName: "Cloud Music",
     packageName: "com.wkq.cloudmusic",
@@ -103,6 +106,7 @@ export const products = [
   },
   {
     slug: "geolens",
+    schemaCategory: "PhotographyApplication",
     name: "GeoLens",
     storeName: "GeoLens: Photo Workflow",
     packageName: "com.wkq.field",
@@ -149,6 +153,7 @@ export const products = [
   },
   {
     slug: "pixora",
+    schemaCategory: "PhotographyApplication",
     name: "Pixora",
     storeName: "Pixora - Offline Photo AI",
     packageName: "com.wkq.aisearch.gallery.offline.ocr",
@@ -195,6 +200,8 @@ export const products = [
   },
   {
     slug: "sitereport",
+    schemaCategory: "BusinessApplication",
+    featured: true,
     name: "SiteReport",
     storeName: "SiteReport: Inspection App",
     packageName: "com.wkq.site",

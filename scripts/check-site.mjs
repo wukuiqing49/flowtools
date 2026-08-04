@@ -30,10 +30,17 @@ const htmlFiles = files.filter((file) => extname(file) === ".html");
 const errors = [];
 let linksChecked = 0;
 let schemasChecked = 0;
+const titles = new Map();
 
 for (const file of htmlFiles) {
   const html = await readFile(file, "utf8");
   if (!/<html lang="(en|zh-CN)">/.test(html)) errors.push(`${file}: missing valid lang attribute`);
+  const title = html.match(/<title>([^<]+)<\/title>/)?.[1]?.trim();
+  if (!title) errors.push(`${file}: missing title`);
+  else if (titles.has(title)) errors.push(`${file}: duplicate title with ${titles.get(title)}`);
+  else titles.set(title, file);
+  if (!/<meta name="description" content="[^"]+"/.test(html)) errors.push(`${file}: missing meta description`);
+  if ((html.match(/<h1\b/g) || []).length !== 1) errors.push(`${file}: expected exactly one h1`);
   if (!/<link rel="canonical"/.test(html)) errors.push(`${file}: missing canonical`);
   if (!/hreflang="en"/.test(html) || !/hreflang="zh-CN"/.test(html) || !/hreflang="x-default"/.test(html)) errors.push(`${file}: incomplete hreflang set`);
   if (!/<meta property="og:title"/.test(html) || !/<meta name="twitter:card"/.test(html)) errors.push(`${file}: incomplete social metadata`);
