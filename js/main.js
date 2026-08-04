@@ -1,43 +1,46 @@
 (function () {
   "use strict";
 
-  const header = document.querySelector(".site-header");
+  const header = document.querySelector("[data-header]");
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".site-nav");
-  const year = document.querySelector("[data-year]");
 
-  if (year) {
+  document.querySelectorAll("[data-year]").forEach(function (year) {
     year.textContent = new Date().getFullYear();
+  });
+
+  function menuIsOpen() {
+    return Boolean(toggle && toggle.getAttribute("aria-expanded") === "true");
   }
 
-  function closeMenu() {
-    if (!toggle || !nav) return;
+  function closeMenu(restoreFocus) {
+    if (!toggle || !nav || !menuIsOpen()) return;
     toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", toggle.dataset.openLabel);
     nav.classList.remove("is-open");
     document.body.classList.remove("menu-open");
+    if (restoreFocus) toggle.focus();
   }
 
   if (toggle && nav) {
     toggle.addEventListener("click", function () {
-      const isOpen = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", String(!isOpen));
-      nav.classList.toggle("is-open", !isOpen);
-      document.body.classList.toggle("menu-open", !isOpen);
+      const shouldOpen = !menuIsOpen();
+      toggle.setAttribute("aria-expanded", String(shouldOpen));
+      toggle.setAttribute("aria-label", shouldOpen ? toggle.dataset.closeLabel : toggle.dataset.openLabel);
+      nav.classList.toggle("is-open", shouldOpen);
+      document.body.classList.toggle("menu-open", shouldOpen);
     });
 
     nav.addEventListener("click", function (event) {
-      if (event.target.closest("a")) closeMenu();
+      if (event.target.closest("a")) closeMenu(false);
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        closeMenu();
-        toggle.focus();
-      }
+      if (event.key === "Escape" && menuIsOpen()) closeMenu(true);
     });
 
     window.addEventListener("resize", function () {
-      if (window.innerWidth >= 700) closeMenu();
+      if (window.innerWidth >= 700) closeMenu(false);
     });
   }
 
@@ -47,4 +50,60 @@
 
   updateHeader();
   window.addEventListener("scroll", updateHeader, { passive: true });
+
+  document.querySelectorAll("[data-language-choice]").forEach(function (link) {
+    link.addEventListener("click", function () {
+      try {
+        localStorage.setItem("flowtools-language", link.dataset.languageChoice);
+      } catch (_) {
+        // Language navigation still works when storage is unavailable.
+      }
+    });
+  });
+
+  const supportProduct = document.querySelector("[data-support-product]");
+  const supportLink = document.querySelector("[data-support-link]");
+  if (supportProduct && supportLink) {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("product");
+    if (requested) {
+      const matchingOption = Array.from(supportProduct.options).find(function (option) {
+        return option.dataset.slug === requested;
+      });
+      if (matchingOption) supportProduct.value = matchingOption.value;
+    }
+
+    function updateSupportLink() {
+      const subject = encodeURIComponent(supportProduct.value + " Support");
+      supportLink.href = "mailto:wukuiqing@gmail.com?subject=" + subject;
+    }
+
+    updateSupportLink();
+    supportProduct.addEventListener("change", updateSupportLink);
+  }
+
+  const dialog = document.querySelector("[data-image-dialog]");
+  if (dialog && typeof dialog.showModal === "function") {
+    const dialogImage = dialog.querySelector("img");
+    const closeButton = dialog.querySelector(".dialog-close");
+    document.querySelectorAll("[data-lightbox-src]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        dialogImage.src = button.dataset.lightboxSrc;
+        dialogImage.alt = button.getAttribute("aria-label");
+        dialog.showModal();
+      });
+    });
+    closeButton.addEventListener("click", function () {
+      dialog.close();
+    });
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+
+  if ("serviceWorker" in navigator && window.location.protocol === "https:") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/service-worker.js");
+    });
+  }
 })();

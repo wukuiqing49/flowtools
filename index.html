@@ -3,213 +3,185 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FlowTools | Professional Android Productivity Apps</title>
-  <meta name="description" content="FlowTools builds professional, offline-first Android applications for image processing, field inspection and productivity workflows.">
+  <title>FlowTools | Practical Android Apps for Real Work</title>
+  <meta name="description" content="FlowTools builds practical Android apps for photo metadata, field inspection, offline AI, field photography and music libraries.">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="https://flowtools.app/">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/styles.css">
-  <script src="js/main.js" defer></script>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "FlowTools",
-      "url": "https://flowtools.app/",
-      "description": "Professional offline-first Android productivity software.",
-      "email": "support@example.com"
-    }
-  </script>
+  <link rel="alternate" hreflang="en" href="https://flowtools.app/">
+  <link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/">
+  <link rel="alternate" hreflang="x-default" href="https://flowtools.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FlowTools">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="FlowTools | Practical Android Apps for Real Work">
+  <meta property="og:description" content="FlowTools builds practical Android apps for photo metadata, field inspection, offline AI, field photography and music libraries.">
+  <meta property="og:url" content="https://flowtools.app/">
+  <meta property="og:image" content="https://flowtools.app/assets/social/home.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FlowTools | Practical Android Apps for Real Work">
+  <meta name="twitter:description" content="FlowTools builds practical Android apps for photo metadata, field inspection, offline AI, field photography and music libraries.">
+  <meta name="twitter:image" content="https://flowtools.app/assets/social/home.png">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"FlowTools","legalName":"Shanghai Yihe Technology Co., Ltd.","url":"https://flowtools.app","email":"wukuiqing@gmail.com","founder":{"@type":"Person","name":"AndroidManTou"},"sameAs":["https://play.google.com/store/apps/details?id=com.wkq.caption&hl=en","https://play.google.com/store/apps/details?id=com.wkq.cloudmusic&hl=en","https://play.google.com/store/apps/details?id=com.wkq.field&hl=en","https://play.google.com/store/apps/details?id=com.wkq.aisearch.gallery.offline.ocr&hl=en","https://play.google.com/store/apps/details?id=com.wkq.site&hl=en"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"FlowTools Android apps","itemListElement":[{"@type":"ListItem","position":1,"url":"https://flowtools.app/products/captionmeta/","name":"CaptionMeta: IPTC Metadata"},{"@type":"ListItem","position":2,"url":"https://flowtools.app/products/cloud-music/","name":"Cloud Music"},{"@type":"ListItem","position":3,"url":"https://flowtools.app/products/geolens/","name":"GeoLens: Photo Workflow"},{"@type":"ListItem","position":4,"url":"https://flowtools.app/products/pixora/","name":"Pixora - Offline Photo AI"},{"@type":"ListItem","position":5,"url":"https://flowtools.app/products/sitereport/","name":"SiteReport: Inspection App"}]}</script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="site-header">
+  <header class="site-header" data-header>
     <div class="container nav-wrap">
-      <a class="brand" href="index.html" aria-label="FlowTools home">
-        <span class="brand-mark" aria-hidden="true"></span>
+      <a class="brand" href="/" aria-label="FlowTools Home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
         <span>FlowTools</span>
       </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation" data-open-label="Open navigation" data-close-label="Close navigation">
         <span class="nav-toggle-lines" aria-hidden="true"></span>
       </button>
       <nav class="site-nav" id="primary-navigation" aria-label="Primary navigation">
         <ul class="nav-list">
-          <li><a class="nav-link" href="index.html" aria-current="page">Home</a></li>
-          <li><a class="nav-link" href="#products">Products</a></li>
-          <li><a class="nav-link" href="privacy.html">Privacy</a></li>
-          <li><a class="nav-link" href="support.html">Support</a></li>
+          <li><a class="nav-link" href="/" aria-current="page">Home</a></li>
+          <li><a class="nav-link" href="/#products">Products</a></li>
+          <li><a class="nav-link" href="/about.html">About</a></li>
+          <li><a class="nav-link" href="/support.html">Support</a></li>
         </ul>
+        <div class="language-switch" aria-label="Language">
+          <span aria-current="true">EN</span>
+          <a href="/zh-cn/" lang="zh-CN" data-language-choice="zh">简体中文</a>
+        </div>
       </nav>
     </div>
   </header>
-
   <main id="main-content">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container hero-grid">
+    <section class="home-hero" aria-labelledby="home-title">
+      <div class="hero-media" aria-hidden="true">
+        <img class="hero-shot hero-shot-one" src="/assets/apps/captionmeta/screen-1.webp" width="592" height="1052" alt="">
+        <img class="hero-shot hero-shot-two" src="/assets/apps/sitereport/screen-1.webp" width="592" height="1052" alt="">
+        <img class="hero-shot hero-shot-three" src="/assets/apps/pixora/screen-1.webp" width="592" height="1052" alt="">
+      </div>
+      <div class="container hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow">Offline-first Android Tools</p>
-          <h1 id="hero-title">Simple tools for real work.</h1>
-          <p>FlowTools builds professional Android applications for image processing, field inspection and productivity workflows.</p>
+          <p class="eyebrow">Independent Android studio</p>
+          <h1 id="home-title">FlowTools for Android</h1>
+          <p>From photo metadata and site inspections to offline AI and music libraries. Focused mobile tools that solve a clear problem and respect your work.</p>
           <div class="button-row">
-            <a class="button button-primary" href="#products">View Products</a>
-            <a class="button button-secondary" href="support.html">Contact Support</a>
+            <a class="button button-primary" href="#products">Browse all apps</a>
+            <a class="button button-ghost" href="/about.html">Meet the studio</a>
           </div>
-        </div>
-
-        <div class="dashboard-wrap" role="img" aria-label="Abstract FlowTools productivity dashboard showing project metrics, activity, and workflow tasks">
-          <div class="dashboard">
-            <div class="dashboard-sidebar" aria-hidden="true">
-              <span class="dashboard-logo">F</span>
-              <span class="side-dot active"></span>
-              <span class="side-dot"></span>
-              <span class="side-dot"></span>
-              <span class="side-dot bottom"></span>
-            </div>
-            <div class="dashboard-main" aria-hidden="true">
-              <div class="dashboard-topbar">
-                <span class="dash-title"></span>
-                <span class="dash-action"></span>
-              </div>
-              <div class="metric-grid">
-                <div class="metric"><span class="metric-label"></span><span class="metric-value"></span></div>
-                <div class="metric"><span class="metric-label"></span><span class="metric-value"></span></div>
-                <div class="metric"><span class="metric-label"></span><span class="metric-value"></span></div>
-              </div>
-              <div class="chart-panel">
-                <span class="chart-heading"></span>
-                <div class="chart-grid"><span></span><span></span><span></span><span></span></div>
-                <div class="chart-line">
-                  <span class="chart-bar"></span><span class="chart-bar"></span><span class="chart-bar"></span><span class="chart-bar"></span>
-                  <span class="chart-bar"></span><span class="chart-bar"></span><span class="chart-bar"></span><span class="chart-bar"></span>
-                </div>
-              </div>
-              <div class="task-panel">
-                <div class="task-item"><span class="task-icon"></span><span class="task-lines"><span></span><span></span></span></div>
-                <div class="task-item"><span class="task-icon"></span><span class="task-lines"><span></span><span></span></span></div>
-                <div class="task-item"><span class="task-icon"></span><span class="task-lines"><span></span><span></span></span></div>
-              </div>
-            </div>
-          </div>
-          <div class="floating-note" aria-hidden="true">
-            <span class="floating-check">&#10003;</span>
-            <span class="floating-copy"><span></span><span></span></span>
+          <div class="hero-facts" aria-label="Product highlights">
+            <span>5 published apps</span>
+            <span>Android native</span>
+            <span>Independently built</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section section-muted" id="products" aria-labelledby="products-title">
+    <section class="section products-section" id="products" aria-labelledby="products-title">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Products</p>
-          <h2 id="products-title">Purpose-built Android software.</h2>
-          <p>Focused tools that keep demanding workflows clear, dependable and close to the device.</p>
+        <div class="section-heading heading-row">
+          <div><p class="eyebrow">Products</p><h2 id="products-title">One focused job. Done properly.</h2></div>
+          <p>A growing collection for photography, field work, offline AI and personal media, built specifically for Android.</p>
         </div>
-        <div class="product-grid">
-          <article class="product-card product-card-featured">
-            <div class="product-card-head">
-              <span class="product-icon" aria-hidden="true">BP</span>
-              <span class="status status-soon">Coming Soon</span>
-            </div>
-            <h3>Batch Photo</h3>
-            <p>Offline batch image processing toolkit.</p>
-            <ul class="feature-list" aria-label="Batch Photo features">
-              <li>Compress</li><li>Resize</li><li>Convert</li><li>Watermark</li><li>Metadata</li>
-              <li>ID Photo</li><li>PDF</li><li>QR</li><li>Background Removal</li>
-            </ul>
-            <a class="button button-secondary button-arrow" href="support.html?product=batch-photo">Learn More</a>
-          </article>
+        <div class="product-grid"><article class="product-card">
+      <div class="product-card-top">
+        <img class="app-icon" src="/assets/apps/captionmeta/icon.png" width="512" height="512" alt="CaptionMeta app icon" loading="lazy">
+        <span class="availability">Google Play</span>
+      </div>
+      <p class="product-category">Photo metadata</p>
+      <h3>CaptionMeta</h3>
+      <p>Edit IPTC, EXIF and XMP metadata on Android. Add captions, keywords and essential photo information without breaking your field workflow.</p>
+      <ul class="tag-list" aria-label="CaptionMeta features"><li>IPTC</li><li>EXIF</li><li>XMP</li><li>Photography</li></ul>
+      <a class="text-action" href="/products/captionmeta/">Explore product<span aria-hidden="true">→</span></a>
+    </article>
+<article class="product-card">
+      <div class="product-card-top">
+        <img class="app-icon" src="/assets/apps/cloud-music/icon.png" width="512" height="512" alt="Cloud Music app icon" loading="lazy">
+        <span class="availability">Google Play</span>
+      </div>
+      <p class="product-category">Music player</p>
+      <h3>Cloud Music</h3>
+      <p>A clean Android music player for browsing cloud music, local tracks, artists and playlists from one practical library.</p>
+      <ul class="tag-list" aria-label="Cloud Music features"><li>Cloud music</li><li>Local library</li><li>Playlists</li><li>Android</li></ul>
+      <a class="text-action" href="/products/cloud-music/">Explore product<span aria-hidden="true">→</span></a>
+    </article>
+<article class="product-card">
+      <div class="product-card-top">
+        <img class="app-icon" src="/assets/apps/geolens/icon.png" width="512" height="512" alt="GeoLens app icon" loading="lazy">
+        <span class="availability">Google Play</span>
+      </div>
+      <p class="product-category">Field photography</p>
+      <h3>GeoLens</h3>
+      <p>Capture, tag and deliver photos with embedded location, metadata and direct server uploads for traceable field media workflows.</p>
+      <ul class="tag-list" aria-label="GeoLens features"><li>Field camera</li><li>GPS</li><li>Metadata</li><li>Upload</li></ul>
+      <a class="text-action" href="/products/geolens/">Explore product<span aria-hidden="true">→</span></a>
+    </article>
+<article class="product-card">
+      <div class="product-card-top">
+        <img class="app-icon" src="/assets/apps/pixora/icon.png" width="512" height="512" alt="Pixora app icon" loading="lazy">
+        <span class="availability">Google Play</span>
+      </div>
+      <p class="product-category">Offline photo AI</p>
+      <h3>Pixora</h3>
+      <p>Search and process your photo library with on-device AI. Find similar images and use practical photo tools without a subscription.</p>
+      <ul class="tag-list" aria-label="Pixora features"><li>Offline AI</li><li>Photo search</li><li>Similar photos</li><li>Privacy</li></ul>
+      <a class="text-action" href="/products/pixora/">Explore product<span aria-hidden="true">→</span></a>
+    </article>
+<article class="product-card">
+      <div class="product-card-top">
+        <img class="app-icon" src="/assets/apps/sitereport/icon.png" width="512" height="512" alt="SiteReport app icon" loading="lazy">
+        <span class="availability">Google Play</span>
+      </div>
+      <p class="product-category">Site inspection</p>
+      <h3>SiteReport</h3>
+      <p>Run inspection checklists, capture photo evidence and GPS context, then create PDF reports for professional site audits.</p>
+      <ul class="tag-list" aria-label="SiteReport features"><li>Inspections</li><li>Checklists</li><li>GPS</li><li>PDF reports</li></ul>
+      <a class="text-action" href="/products/sitereport/">Explore product<span aria-hidden="true">→</span></a>
+    </article></div>
+      </div>
+    </section>
 
-          <article class="product-card">
-            <div class="product-card-head">
-              <span class="product-icon" aria-hidden="true">SR</span>
-              <span class="status status-available">Available</span>
-            </div>
-            <h3>SiteReport</h3>
-            <p>Professional site inspection and field reporting application.</p>
-            <ul class="feature-list" aria-label="SiteReport features">
-              <li>Inspection Checklists</li><li>Photo Evidence</li><li>GPS</li>
-              <li>PDF Reports</li><li>Excel Export</li><li>Offline</li>
-            </ul>
-          </article>
-
-          <article class="product-card">
-            <div class="product-card-head">
-              <span class="product-icon" aria-hidden="true">CM</span>
-              <span class="status status-available">Available</span>
-            </div>
-            <h3>CaptionMeta</h3>
-            <p>Professional IPTC, EXIF and XMP metadata editor.</p>
-            <ul class="feature-list" aria-label="CaptionMeta features">
-              <li>IPTC</li><li>EXIF</li><li>Keywords</li><li>Captions</li>
-              <li>Copyright</li><li>Photo Metadata</li>
-            </ul>
-          </article>
+    <section class="section principles" aria-labelledby="principles-title">
+      <div class="container">
+        <div class="section-heading"><p class="eyebrow">Product principles</p><h2 id="principles-title">Software should make the work clearer.</h2></div>
+        <div class="principle-grid">
+          <article><span>01</span><h3>Focused</h3><p>Each app is built around a defined task, without unrelated clutter.</p></article>
+          <article><span>02</span><h3>Device first</h3><p>Local and offline processing is preferred where the workflow allows it.</p></article>
+          <article><span>03</span><h3>Ready to deliver</h3><p>From metadata to PDF, outputs are prepared for the next step.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="why-title">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Why FlowTools</p>
-          <h2 id="why-title">Software that respects the work.</h2>
-        </div>
-        <div class="benefit-grid">
-          <article class="benefit">
-            <span class="benefit-number">01</span>
-            <h3>Offline First</h3>
-            <p>Core functionality works without cloud services.</p>
-          </article>
-          <article class="benefit">
-            <span class="benefit-number">02</span>
-            <h3>Privacy First</h3>
-            <p>Photos remain on the device whenever possible.</p>
-          </article>
-          <article class="benefit">
-            <span class="benefit-number">03</span>
-            <h3>Professional</h3>
-            <p>Designed for engineers, creators and professionals.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="support-band" aria-labelledby="support-title">
-      <div class="container">
-        <div class="support-card">
-          <div>
-            <p class="eyebrow">Support</p>
-            <h2 id="support-title">Clear answers when you need them.</h2>
-            <p>Questions about a FlowTools product? Contact our support team directly.</p>
-          </div>
-          <a class="button button-secondary" href="mailto:support@example.com">support@example.com</a>
-        </div>
+    <section class="company-band" aria-labelledby="company-title">
+      <div class="container company-layout">
+        <div><p class="eyebrow">The studio</p><h2 id="company-title">Shanghai Yihe Technology Co., Ltd.</h2></div>
+        <div><p>FlowTools is the Android software brand of AndroidManTou, publishing independent tools for professional workflows and everyday use.</p><a class="text-action light" href="/about.html">About the studio<span aria-hidden="true">→</span></a></div>
       </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a class="brand" href="index.html" aria-label="FlowTools home"><span class="brand-mark" aria-hidden="true"></span><span>FlowTools</span></a>
-          <p>Professional Android tools for work that matters.</p>
-        </div>
-        <nav aria-label="Footer navigation">
-          <ul class="footer-links">
-            <li><a href="#products">Products</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="support.html">Support</a></li>
-          </ul>
-        </nav>
+<footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/" aria-label="FlowTools Home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span></span><span>FlowTools</span>
+        </a>
+        <p>Practical Android software for work, media and everyday life.</p>
       </div>
-      <div class="footer-bottom">
-        <span>&copy; <span data-year>2026</span> FlowTools. All rights reserved.</span>
-        <span>Built for Android.</span>
-      </div>
+      <nav aria-label="Footer navigation">
+        <ul class="footer-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="/privacy.html">Privacy</a></li>
+          <li><a href="/support.html">Support</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span data-year>2026</span> Shanghai Yihe Technology Co., Ltd.. All rights reserved.</span>
+      <span>Developed by AndroidManTou</span>
     </div>
   </footer>
 </body>
