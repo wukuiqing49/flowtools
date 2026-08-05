@@ -27,12 +27,13 @@ PWA and social images can be regenerated on Windows with:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/generate-icons.ps1
+powershell -ExecutionPolicy Bypass -File scripts/generate-app-web-icons.ps1
 powershell -ExecutionPolicy Bypass -File scripts/generate-social-images.ps1
 ```
 
 ## Content Updates
 
-Edit product names, descriptions, package IDs and localized content in `site.config.mjs`, then run the build and check commands. Product icons and screenshots under `assets/apps/` come from the current public Google Play listings.
+Edit product names, descriptions, package IDs and localized content in `site.config.mjs`, then run the build and check commands. Original assets under `assets/apps/` are retained as source material. Verify product names, screenshots, permissions and offline behavior against the current app and Google Play listing before publishing them.
 
 ## Launch Checklist
 

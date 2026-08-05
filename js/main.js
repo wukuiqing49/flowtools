@@ -82,25 +82,6 @@
     supportProduct.addEventListener("change", updateSupportLink);
   }
 
-  const dialog = document.querySelector("[data-image-dialog]");
-  if (dialog && typeof dialog.showModal === "function") {
-    const dialogImage = dialog.querySelector("img");
-    const closeButton = dialog.querySelector(".dialog-close");
-    document.querySelectorAll("[data-lightbox-src]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        dialogImage.src = button.dataset.lightboxSrc;
-        dialogImage.alt = button.getAttribute("aria-label");
-        dialog.showModal();
-      });
-    });
-    closeButton.addEventListener("click", function () {
-      dialog.close();
-    });
-    dialog.addEventListener("click", function (event) {
-      if (event.target === dialog) dialog.close();
-    });
-  }
-
   if ("serviceWorker" in navigator && window.location.protocol === "https:") {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("/service-worker.js");

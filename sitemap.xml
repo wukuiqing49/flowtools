@@ -71,6 +71,20 @@
     <lastmod>2026-08-05</lastmod>
   </url>
   <url>
+    <loc>https://flowtools.app/products/sitereport/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/sitereport/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/sitereport/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://flowtools.app/products/sitereport/"/>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://flowtools.app/zh-cn/products/sitereport/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/sitereport/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/sitereport/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://flowtools.app/products/sitereport/"/>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
     <loc>https://flowtools.app/products/captionmeta/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/captionmeta/"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/captionmeta/"/>
@@ -124,20 +138,6 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/pixora/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/pixora/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://flowtools.app/products/pixora/"/>
-    <lastmod>2026-08-05</lastmod>
-  </url>
-  <url>
-    <loc>https://flowtools.app/products/sitereport/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/sitereport/"/>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/sitereport/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://flowtools.app/products/sitereport/"/>
-    <lastmod>2026-08-05</lastmod>
-  </url>
-  <url>
-    <loc>https://flowtools.app/zh-cn/products/sitereport/</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://flowtools.app/zh-cn/products/sitereport/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://flowtools.app/products/sitereport/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://flowtools.app/products/sitereport/"/>
     <lastmod>2026-08-05</lastmod>
   </url>
 </urlset>

@@ -7,6 +7,7 @@
   <meta name="description" content="A clean Android music player for browsing cloud music, local tracks, artists and playlists from one practical library.">
   <meta name="author" content="Shanghai Cudong Technology Co., Ltd.">
   <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="keywords" content="Cloud music, Offline playback, Local library, Playlists, Android, offline music player Android, local music scanner, cloud music player, Android playlist player, personal music library">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="https://flowtools.app/products/cloud-music/">
@@ -30,9 +31,11 @@
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/product-pages.css">
   <script src="/js/main.js" defer></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Cloud Music","description":"A clean Android music player for browsing cloud music, local tracks, artists and playlists from one practical library.","operatingSystem":"Android","applicationCategory":"MusicApplication","applicationSubCategory":"Music player","featureList":["Cloud music","Local playback","Organized library","Local scanning"],"keywords":"Cloud music, Local library, Playlists, Android, Music player, Android","url":"https://flowtools.app/products/cloud-music/","downloadUrl":"https://play.google.com/store/apps/details?id=com.wkq.cloudmusic&hl=en","image":"https://flowtools.app/assets/apps/cloud-music/icon.png","screenshot":["https://flowtools.app/assets/apps/cloud-music/screen-1.webp","https://flowtools.app/assets/apps/cloud-music/screen-2.webp"],"publisher":{"@id":"https://flowtools.app/#organization"}}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can Cloud Music play local files?","acceptedAnswer":{"@type":"Answer","text":"Yes. The app includes a local music library and device scanning workflow."}},{"@type":"Question","name":"Does it organize artists and playlists?","acceptedAnswer":{"@type":"Answer","text":"Yes. Artists and playlists are available as dedicated library views."}},{"@type":"Question","name":"Where can I install Cloud Music?","acceptedAnswer":{"@type":"Answer","text":"Cloud Music is available for Android through Google Play."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Cloud Music","description":"A clean Android music player for browsing cloud music, local tracks, artists and playlists from one practical library.","operatingSystem":"Android","applicationCategory":"MusicApplication","applicationSubCategory":"Music player","inLanguage":"en","keywords":"Cloud music, Offline playback, Local library, Playlists, Android, offline music player Android, local music scanner, cloud music player, Android playlist player, personal music library","featureList":["Cloud music","Local playback","Organized library","Local scanning","Offline local playback","Separate music sources"],"audience":[{"@type":"Audience","audienceType":"Local-library listeners"},{"@type":"Audience","audienceType":"Cloud collection owners"},{"@type":"Audience","audienceType":"Playlist users"}],"url":"https://flowtools.app/products/cloud-music/","downloadUrl":"https://play.google.com/store/apps/details?id=com.wkq.cloudmusic&hl=en","image":"https://flowtools.app/assets/apps/cloud-music/icon-192.png","publisher":{"@id":"https://flowtools.app/#organization"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to use Cloud Music","description":"Cloud and local music in one focused player.","step":[{"@type":"HowToStep","position":1,"name":"Choose a source","text":"Open local music or a cloud source according to where the collection is stored."},{"@type":"HowToStep","position":2,"name":"Build the library","text":"Scan compatible device files and browse the available artists and playlists."},{"@type":"HowToStep","position":3,"name":"Play and organize","text":"Select tracks from the library and return to the source or playlist when needed."}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can Cloud Music play local files?","acceptedAnswer":{"@type":"Answer","text":"Yes. The app includes a local music library and device scanning workflow."}},{"@type":"Question","name":"Does it organize artists and playlists?","acceptedAnswer":{"@type":"Answer","text":"Yes. Artists and playlists are available as dedicated library views."}},{"@type":"Question","name":"Can I listen offline?","acceptedAnswer":{"@type":"Answer","text":"Compatible music already stored on the device can be played from the local library without opening a cloud source. Remote collections require network access."}},{"@type":"Question","name":"Does Cloud Music provide a subscription catalog?","acceptedAnswer":{"@type":"Answer","text":"Cloud Music is designed around music you already store locally or access through a source you configure, rather than a bundled subscription catalog."}},{"@type":"Question","name":"Where can I install Cloud Music?","acceptedAnswer":{"@type":"Answer","text":"Cloud Music is available for Android through Google Play."}}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://flowtools.app/"},{"@type":"ListItem","position":2,"name":"Products","item":"https://flowtools.app/products/"},{"@type":"ListItem","position":3,"name":"Cloud Music","item":"https://flowtools.app/products/cloud-music/"}]}</script>
 </head>
 <body>
@@ -60,45 +63,61 @@
       </nav>
     </div>
   </header>
-  <main id="main-content">
+  <main class="product-page product-cloud-music" id="main-content">
     <section class="product-hero" aria-labelledby="product-title">
-      <img class="product-backdrop" src="/assets/apps/cloud-music/screen-1.webp" width="592" height="1052" alt="" aria-hidden="true">
       <div class="container product-hero-inner">
         <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">/</span>
     <a href="/products/">Products</a><span aria-hidden="true">/</span>
     <span aria-current="page">Cloud Music</span>
   </nav>
-        <div class="product-identity">
-          <img class="product-hero-icon" src="/assets/apps/cloud-music/icon.png" width="512" height="512" alt="Cloud Music app icon">
-          <div>
-            <p class="eyebrow">Music player</p>
-            <h1 id="product-title">Cloud Music</h1>
+        <div class="product-hero-layout">
+          <div class="product-identity">
+            <div class="product-lockup">
+              <img class="product-hero-icon" src="/assets/apps/cloud-music/icon-192.png" width="512" height="512" alt="Cloud Music app icon">
+              <div><p class="eyebrow">Music player</p><h1 id="product-title">Cloud Music</h1></div>
+            </div>
             <p class="product-tagline">Cloud and local music in one focused player.</p>
             <p class="product-description">A clean Android music player for browsing cloud music, local tracks, artists and playlists from one practical library.</p>
-            <div class="button-row"><a class="button button-primary store-button" href="https://play.google.com/store/apps/details?id=com.wkq.cloudmusic&hl=en" target="_blank" rel="noopener">Get it on Google Play<span aria-hidden="true">↗</span></a><a class="button button-ghost" href="/support.html?product=cloud-music">Contact support</a></div>
+            <ul class="product-signals" aria-label="Cloud Music product highlights"><li>Cloud music</li><li>Offline playback</li><li>Local library</li><li>Playlists</li><li>Android</li></ul>
+            <div class="button-row product-actions"><a class="google-play-badge product-play-badge" href="https://play.google.com/store/apps/details?id=com.wkq.cloudmusic&hl=en" target="_blank" rel="noopener" aria-label="Get Cloud Music on Google Play"><img src="/assets/badges/google-play-en.png" width="646" height="250" alt="Get Cloud Music on Google Play"></a><a class="button button-ghost" href="/support.html?product=cloud-music">Contact support</a></div>
             <p class="package-name">com.wkq.cloudmusic</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section screenshots-section" aria-labelledby="screenshots-title">
-      <div class="container"><div class="section-heading"><p class="eyebrow">Inside the app</p><h2 id="screenshots-title">Product screenshots</h2></div><div class="screenshot-strip"><button class="shot-button" type="button" data-lightbox-src="/assets/apps/cloud-music/screen-1.webp" aria-label="Cloud Music screenshot 1"><img src="/assets/apps/cloud-music/screen-1.webp" width="592" height="1052" alt="Cloud Music app interface screenshot 1" loading="eager"></button><button class="shot-button" type="button" data-lightbox-src="/assets/apps/cloud-music/screen-2.webp" aria-label="Cloud Music screenshot 2"><img src="/assets/apps/cloud-music/screen-2.webp" width="592" height="1052" alt="Cloud Music app interface screenshot 2" loading="lazy"></button></div></div>
+    <section class="section product-overview-section" aria-labelledby="overview-title">
+      <div class="container product-overview-layout">
+        <div class="overview-copy"><p class="eyebrow">Product purpose</p><h2 id="overview-title">What Cloud Music helps you do</h2><p>Cloud Music combines local tracks and user-selected cloud music sources in a straightforward Android library. It keeps common destinations such as artists, playlists and device music within a small number of navigation steps.</p><p>The app is intended for people who already manage their own music collection and want a focused player rather than a subscription catalog. Local scanning brings compatible files into the library, while cloud access remains a separate source chosen by the user.</p><p>Music already stored on the device can be organized and played through the local library without opening a cloud source. Network access is needed when the selected collection is stored remotely or when that external source requires account access.</p></div>
+        <aside class="product-fact-panel" aria-label="Product information">
+          <p class="eyebrow">Product facts</p>
+          <dl class="product-facts"><div><dt>Platform</dt><dd>Android</dd></div><div><dt>Category</dt><dd>Music player</dd></div><div><dt>Availability</dt><dd>Google Play</dd></div><div><dt>Developer</dt><dd>AndroidManTou</dd></div></dl>
+          <div class="product-audience-summary"><h3>Best for</h3><ul><li>Local-library listeners</li><li>Cloud collection owners</li><li>Playlist users</li></ul></div>
+          <div class="product-trust"><h3>Data and privacy context</h3><p>Local scanning is used for music files on the device. Network access is relevant when you actively open a cloud source; that source may apply its own account, storage and privacy terms.</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section workflow-section" aria-labelledby="workflow-title">
+      <div class="container"><div class="section-heading"><p class="eyebrow">Workflow</p><h2 id="workflow-title">A clear path through Cloud Music</h2></div><ol class="workflow-grid"><li><span>01</span><h3>Choose a source</h3><p>Open local music or a cloud source according to where the collection is stored.</p></li><li><span>02</span><h3>Build the library</h3><p>Scan compatible device files and browse the available artists and playlists.</p></li><li><span>03</span><h3>Play and organize</h3><p>Select tracks from the library and return to the source or playlist when needed.</p></li></ol></div>
+    </section>
+
+    <section class="section use-case-section" aria-labelledby="use-cases-title">
+      <div class="container"><div class="section-heading"><p class="eyebrow">Practical scenarios</p><h2 id="use-cases-title">Common use cases for Cloud Music</h2></div><div class="use-case-grid"><article><h3>Offline listening</h3><p>Play compatible music already saved on the Android device during travel, commuting or limited connectivity.</p></article><article><h3>Personal cloud collections</h3><p>Open a configured remote music source without turning the player into a subscription catalog.</p></article><article><h3>Device library scanning</h3><p>Bring supported audio files into a browsable local library organized around tracks and artists.</p></article><article><h3>Playlist navigation</h3><p>Move between saved playlists, artists and music sources from one compact player.</p></article></div></div>
     </section>
 
     <section class="section feature-section" aria-labelledby="features-title">
-      <div class="container"><div class="section-heading"><p class="eyebrow">Core capabilities</p><h2 id="features-title">Product features</h2></div><div class="feature-grid"><article class="feature-item"><span>01</span><h3>Cloud music</h3><p>Open your cloud music library from a dedicated source.</p></article><article class="feature-item"><span>02</span><h3>Local playback</h3><p>Browse and play music already stored on your device.</p></article><article class="feature-item"><span>03</span><h3>Organized library</h3><p>Move between artists, playlists and music sources quickly.</p></article><article class="feature-item"><span>04</span><h3>Local scanning</h3><p>Scan the device to bring compatible tracks into your library.</p></article></div></div>
+      <div class="container"><div class="section-heading"><p class="eyebrow">Core capabilities</p><h2 id="features-title">Built for focused work</h2></div><div class="feature-grid"><article class="feature-item"><span>01</span><h3>Cloud music</h3><p>Open your cloud music library from a dedicated source.</p></article><article class="feature-item"><span>02</span><h3>Local playback</h3><p>Browse and play music already stored on your device.</p></article><article class="feature-item"><span>03</span><h3>Organized library</h3><p>Move between artists, playlists and music sources quickly.</p></article><article class="feature-item"><span>04</span><h3>Local scanning</h3><p>Scan the device to bring compatible tracks into your library.</p></article><article class="feature-item"><span>05</span><h3>Offline local playback</h3><p>Listen to compatible files stored on the device without opening a cloud source.</p></article><article class="feature-item"><span>06</span><h3>Separate music sources</h3><p>Keep local and configured cloud collections understandable within one player.</p></article></div></div>
     </section>
 
     <section class="section faq-section" aria-labelledby="faq-title">
-      <div class="container faq-layout"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="faq-title">Frequently asked questions</h2></div><div class="faq-list"><details><summary>Can Cloud Music play local files?</summary><p>Yes. The app includes a local music library and device scanning workflow.</p></details><details><summary>Does it organize artists and playlists?</summary><p>Yes. Artists and playlists are available as dedicated library views.</p></details><details><summary>Where can I install Cloud Music?</summary><p>Cloud Music is available for Android through Google Play.</p></details></div></div>
+      <div class="container faq-layout"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="faq-title">Frequently asked questions</h2></div><div class="faq-list"><details><summary>Can Cloud Music play local files?</summary><p>Yes. The app includes a local music library and device scanning workflow.</p></details><details><summary>Does it organize artists and playlists?</summary><p>Yes. Artists and playlists are available as dedicated library views.</p></details><details><summary>Can I listen offline?</summary><p>Compatible music already stored on the device can be played from the local library without opening a cloud source. Remote collections require network access.</p></details><details><summary>Does Cloud Music provide a subscription catalog?</summary><p>Cloud Music is designed around music you already store locally or access through a source you configure, rather than a bundled subscription catalog.</p></details><details><summary>Where can I install Cloud Music?</summary><p>Cloud Music is available for Android through Google Play.</p></details></div></div>
     </section>
 
     <section class="section related-section" aria-labelledby="related-title">
-      <div class="container"><div class="section-heading"><p class="eyebrow">FlowTools</p><h2 id="related-title">Explore more Android tools</h2></div><div class="related-grid"><a class="related-product" href="/products/captionmeta/"><img src="/assets/apps/captionmeta/icon.png" width="512" height="512" alt="" loading="lazy"><span><strong>CaptionMeta</strong><small>Photo metadata</small></span><span aria-hidden="true">→</span></a><a class="related-product" href="/products/geolens/"><img src="/assets/apps/geolens/icon.png" width="512" height="512" alt="" loading="lazy"><span><strong>GeoLens</strong><small>Field photography</small></span><span aria-hidden="true">→</span></a><a class="related-product" href="/products/pixora/"><img src="/assets/apps/pixora/icon.png" width="512" height="512" alt="" loading="lazy"><span><strong>Pixora</strong><small>Offline photo AI</small></span><span aria-hidden="true">→</span></a></div></div>
+      <div class="container"><div class="section-heading"><p class="eyebrow">FlowTools</p><h2 id="related-title">Explore more Android tools</h2></div><div class="related-grid"><a class="related-product" href="/products/pixora/"><img src="/assets/apps/pixora/icon-192.png" width="512" height="512" alt="" loading="lazy"><span><strong>Pixora</strong><small>Offline photo AI</small></span><span aria-hidden="true">→</span></a><a class="related-product" href="/products/captionmeta/"><img src="/assets/apps/captionmeta/icon-192.png" width="512" height="512" alt="" loading="lazy"><span><strong>CaptionMeta</strong><small>Photo metadata</small></span><span aria-hidden="true">→</span></a><a class="related-product" href="/products/geolens/"><img src="/assets/apps/geolens/icon-192.png" width="512" height="512" alt="" loading="lazy"><span><strong>GeoLens</strong><small>Field photography</small></span><span aria-hidden="true">→</span></a></div></div>
     </section>
-    <dialog class="image-dialog" data-image-dialog><button class="dialog-close" type="button" aria-label="Close image" title="Close">×</button><img src="" alt=""></dialog>
   </main>
 <footer class="site-footer">
     <div class="container footer-grid">

@@ -5,6 +5,8 @@ import { products, site, storeUrl } from "../site.config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const updated = "2026-08-05";
+const siteUpdated = "2026-08-05";
+const privacyUpdated = "2026-08-05";
 
 const copy = {
   en: {
@@ -23,8 +25,7 @@ const copy = {
     menuClose: "Close navigation",
     viewProduct: "Explore product",
     getPlay: "Get it on Google Play",
-    screenshots: "Product screenshots",
-    features: "Product features",
+    features: "Built for focused work",
     faq: "Frequently asked questions",
     related: "Explore more Android tools",
     contact: "Contact support",
@@ -50,8 +51,7 @@ const copy = {
     menuClose: "关闭导航",
     viewProduct: "查看产品",
     getPlay: "前往 Google Play",
-    screenshots: "产品截图",
-    features: "功能介绍",
+    features: "为专注工作而设计",
     faq: "常见问题",
     related: "探索更多 Android 工具",
     contact: "联系支持",
@@ -62,6 +62,9 @@ const copy = {
     breadcrumbProducts: "产品"
   }
 };
+
+const productDisplayOrder = ["sitereport", "captionmeta", "cloud-music", "geolens", "pixora"];
+const orderedProducts = productDisplayOrder.map((slug) => products.find((product) => product.slug === slug));
 
 function esc(value) {
   return String(value)
@@ -96,7 +99,7 @@ function localizedProductPagePath(locale, product, page) {
   return `${prefix}/products/${product.slug}/${page}.html`;
 }
 
-function head({ locale, title, description, path, alternatePath, image, imageAlt = title, schemas = [], type = "website", robots = "index,follow,max-image-preview:large" }) {
+function head({ locale, title, description, path, alternatePath, image, imageAlt = title, schemas = [], type = "website", robots = "index,follow,max-image-preview:large", productStyles = false, keywords = [] }) {
   const c = copy[locale];
   const canonical = `${site.domain}${path}`;
   const alternate = `${site.domain}${alternatePath}`;
@@ -112,7 +115,7 @@ function head({ locale, title, description, path, alternatePath, image, imageAlt
   <meta name="description" content="${esc(description)}">
   <meta name="author" content="${esc(site.company[locale])}">
   <meta name="robots" content="${robots}">
-  <meta name="theme-color" content="#ffffff">
+${keywords.length ? `  <meta name="keywords" content="${esc(keywords.join(", "))}">\n` : ""}  <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="${canonical}">
   <link rel="alternate" hreflang="en" href="${english}">
@@ -135,7 +138,7 @@ function head({ locale, title, description, path, alternatePath, image, imageAlt
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/main.js" defer></script>
+${productStyles ? '  <link rel="stylesheet" href="/css/product-pages.css">\n' : ""}  <script src="/js/main.js" defer></script>
 ${schemas.length ? `  ${schemas.map(jsonLd).join("\n  ")}\n` : ""}</head>`;
 }
 
@@ -219,7 +222,8 @@ function organizationSchema(locale) {
       "offline photo AI",
       "mobile music libraries"
     ],
-    contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: site.email, availableLanguage: ["en", "zh-CN"] }
+    contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: site.email, availableLanguage: ["en", "zh-CN"] },
+    sameAs: orderedProducts.map((product) => storeUrl(product, locale))
   };
 }
 
@@ -298,16 +302,13 @@ function homePage(locale) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: isZh ? "FlowTools Android 应用" : "FlowTools Android apps",
-    itemListElement: products.map((product, index) => ({
+    itemListElement: orderedProducts.map((product, index) => ({
       "@type": "ListItem",
       position: index + 1,
       url: `${site.domain}${localizedPath(locale, "product", product.slug)}`,
       name: product.storeName
     }))
   };
-  const featuredProduct = products.find((product) => product.featured) || products[0];
-  const featuredContent = featuredProduct[locale];
-  const featuredFeatures = featuredContent.features.slice(0, 3).map(([name, text], index) => `<li><span>${String(index + 1).padStart(2, "0")}</span><div><strong>${name}</strong><p>${text}</p></div></li>`).join("");
   const studioFaq = isZh ? [
     ["上海促动科技有限公司做什么？", "上海促动科技有限公司是一家 Android 产品工作室，通过 FlowTools 品牌开发和维护面向现场工作、摄影、媒体与效率场景的实用软件。"],
     ["FlowTools 有哪些产品？", "FlowTools 目前包含 SiteReport、CaptionMeta、GeoLens、Pixora 和 Cloud Music，分别面向现场检查、照片元数据、现场摄影、离线照片 AI 和音乐管理。"],
@@ -320,12 +321,12 @@ function homePage(locale) {
     ["Where can I get FlowTools apps?", "Each product page provides a Google Play link. Check the relevant product page and Google Play listing for current features, permissions and data practices."]
   ];
   const studioFaqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: studioFaq.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) };
-  const cards = products.filter((product) => product !== featuredProduct).map((product) => {
+  const cards = orderedProducts.map((product) => {
     const content = product[locale];
     return `<article class="product-card">
       <div class="product-card-top">
         <img class="app-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon" loading="lazy">
-        <span class="availability">Google Play</span>
+        ${googlePlayBadge(locale, product, "card")}
       </div>
       <p class="product-category">${content.category}</p>
       <h3>${product.name}</h3>
@@ -344,43 +345,10 @@ ${header(locale, "home", alternatePath)}
           <h1 id="home-title">${isZh ? "为真实工作，打造更好的软件。" : "Software for real-world work."}</h1>
           <p>${isZh ? "我们设计、开发并持续维护面向现场工作、摄影、媒体和效率场景的 Android 产品。少一点复杂，多一点真正有用。" : "We design, build and maintain Android products for field work, photography, media and everyday productivity. Less complexity. More of what is genuinely useful."}</p>
           <div class="button-row">
-            <a class="button button-primary" href="#work">${isZh ? "查看我们的产品" : "Explore our work"}<span aria-hidden="true">→</span></a>
+            <a class="button button-primary" href="#products">${isZh ? "查看我们的产品" : "Explore our work"}<span aria-hidden="true">→</span></a>
             <a class="button button-ghost" href="${localizedPath(locale, "about")}">${isZh ? "了解公司" : "About the studio"}</a>
           </div>
           <p class="hero-meta">${isZh ? "5 款已发布产品 · Android 原生 · 持续维护" : "5 published products · Android native · Actively maintained"}</p>
-        </div>
-        <div class="hero-visual">
-          <div class="hero-visual-glow" aria-hidden="true"></div>
-          <div class="hero-gallery">
-            <img class="hero-gallery-main" src="${featuredProduct.screenshots[1] || featuredProduct.screenshots[0]}" width="592" height="1052" alt="${esc(featuredProduct.name)} app interface" fetchpriority="high">
-            <img class="hero-gallery-secondary" src="${featuredProduct.screenshots[2] || featuredProduct.screenshots[0]}" width="592" height="1052" alt="" loading="lazy">
-          </div>
-          <div class="hero-visual-caption"><strong>${featuredProduct.name}</strong><span>${isZh ? "重点项目 · " : "Selected work · "}${featuredContent.category}</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="studio-stats" aria-label="${isZh ? "工作室概览" : "Studio overview"}">
-      <div class="container studio-stats-grid">
-        <div><strong>01</strong><span>${isZh ? "从真实问题出发" : "Start with a real problem"}</span></div>
-        <div><strong>05</strong><span>${isZh ? "已发布 Android 产品" : "Published Android products"}</span></div>
-        <div><strong>01</strong><span>${isZh ? "独立、持续负责的团队" : "Independent team, end to end"}</span></div>
-      </div>
-    </section>
-
-    <section class="section featured-project" id="work" aria-labelledby="featured-project-title">
-      <div class="container featured-project-layout">
-        <div class="featured-project-media">
-          <img src="${featuredProduct.screenshots[0]}" width="592" height="1052" alt="${esc(featuredProduct.name)} app interface" loading="lazy">
-          <span class="featured-project-badge">${isZh ? "重点项目" : "Featured project"}</span>
-        </div>
-        <div class="featured-project-copy">
-          <p class="eyebrow">${isZh ? "精选项目 · 01" : "Selected work · 01"}</p>
-          <h2 id="featured-project-title">${featuredProduct.name}</h2>
-          <p class="featured-project-tagline">${featuredContent.tagline}</p>
-          <p>${featuredContent.description}</p>
-          <ul class="featured-project-features">${featuredFeatures}</ul>
-          <a class="button button-primary" href="${localizedPath(locale, "product", featuredProduct.slug)}">${isZh ? "查看完整案例" : "Read the full case"}<span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -429,6 +397,21 @@ function breadcrumb(locale, product) {
   </nav>`;
 }
 
+function googlePlayBadge(locale, product, placement) {
+  const isZh = locale === "zh";
+  const asset = isZh ? "/assets/badges/google-play-zh-cn.png" : "/assets/badges/google-play-en.png";
+  const label = isZh ? `在 Google Play 获取 ${product.name}` : `Get ${product.name} on Google Play`;
+  return `<a class="google-play-badge ${placement}-play-badge" href="${storeUrl(product, locale)}" target="_blank" rel="noopener" aria-label="${esc(label)}"><img src="${asset}" width="646" height="250" alt="${esc(label)}"${placement === "card" ? ' loading="lazy"' : ""}></a>`;
+}
+
+const relatedProductSlugs = {
+  captionmeta: ["geolens", "pixora", "sitereport"],
+  "cloud-music": ["pixora", "captionmeta", "geolens"],
+  geolens: ["captionmeta", "sitereport", "pixora"],
+  pixora: ["captionmeta", "cloud-music", "geolens"],
+  sitereport: ["geolens", "captionmeta", "pixora"]
+};
+
 function productPage(locale, product) {
   const c = copy[locale];
   const isZh = locale === "zh";
@@ -444,12 +427,13 @@ function productPage(locale, product) {
     operatingSystem: "Android",
     applicationCategory: product.schemaCategory,
     applicationSubCategory: content.category,
+    inLanguage: c.lang,
+    keywords: [...content.tags, ...content.searchTerms].join(", "),
     featureList: content.features.map(([name]) => name),
-    keywords: [...content.tags, content.category, "Android"].join(", "),
+    audience: content.audiences.map(([name]) => ({ "@type": "Audience", audienceType: name })),
     url: `${site.domain}${path}`,
     downloadUrl: storeUrl(product, locale),
     image: `${site.domain}${product.icon}`,
-    screenshot: product.screenshots.map((image) => `${site.domain}${image}`),
     publisher: { "@id": `${site.domain}/#organization` }
   };
   const faqSchema = {
@@ -461,33 +445,66 @@ function productPage(locale, product) {
       acceptedAnswer: { "@type": "Answer", text: answer }
     }))
   };
-  const screenshots = product.screenshots.map((image, index) => `<button class="shot-button" type="button" data-lightbox-src="${image}" aria-label="${esc(product.name)} ${isZh ? `截图 ${index + 1}` : `screenshot ${index + 1}`}"><img src="${image}" width="592" height="1052" alt="${esc(product.name)} ${isZh ? `应用界面截图 ${index + 1}` : `app interface screenshot ${index + 1}`}" loading="${index === 0 ? "eager" : "lazy"}"></button>`).join("");
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: isZh ? `如何使用 ${product.name}` : `How to use ${product.name}`,
+    description: content.tagline,
+    step: content.workflow.map(([name, text], index) => ({
+      "@type": "HowToStep",
+      position: index + 1,
+      name,
+      text
+    }))
+  };
+  const signals = content.tags.map((tag) => `<li>${tag}</li>`).join("");
+  const overview = content.overview.map((paragraph) => `<p>${paragraph}</p>`).join("");
+  const audienceNames = content.audiences.map(([name]) => `<li>${name}</li>`).join("");
+  const useCases = content.useCases.map(([name, text]) => `<article><h3>${name}</h3><p>${text}</p></article>`).join("");
+  const workflow = content.workflow.map(([name, text], index) => `<li><span>${String(index + 1).padStart(2, "0")}</span><h3>${name}</h3><p>${text}</p></li>`).join("");
   const features = content.features.map(([name, text], index) => `<article class="feature-item"><span>${String(index + 1).padStart(2, "0")}</span><h3>${name}</h3><p>${text}</p></article>`).join("");
   const faqs = content.faq.map(([question, answer]) => `<details><summary>${question}</summary><p>${answer}</p></details>`).join("");
-  const related = products.filter((item) => item.slug !== product.slug).slice(0, 3).map((item) => `<a class="related-product" href="${localizedPath(locale, "product", item.slug)}"><img src="${item.icon}" width="512" height="512" alt="" loading="lazy"><span><strong>${item.name}</strong><small>${item[locale].category}</small></span><span aria-hidden="true">→</span></a>`).join("");
-  return `${head({ locale, title, description: content.description, path, alternatePath, image: `/assets/social/${product.slug}.png`, imageAlt: `${product.name} Android app`, schemas: [schema, faqSchema, breadcrumbSchema(locale, product)], type: "product" })}
+  const related = relatedProductSlugs[product.slug].map((slug) => products.find((item) => item.slug === slug)).map((item) => `<a class="related-product" href="${localizedPath(locale, "product", item.slug)}"><img src="${item.icon}" width="512" height="512" alt="" loading="lazy"><span><strong>${item.name}</strong><small>${item[locale].category}</small></span><span aria-hidden="true">→</span></a>`).join("");
+  return `${head({ locale, title, description: content.description, path, alternatePath, image: `/assets/social/${product.slug}.png`, imageAlt: `${product.name} Android app`, schemas: [schema, howToSchema, faqSchema, breadcrumbSchema(locale, product)], type: "product", productStyles: true, keywords: [...content.tags, ...content.searchTerms] })}
 ${header(locale, "products", alternatePath)}
-  <main id="main-content">
+  <main class="product-page product-${product.slug}" id="main-content">
     <section class="product-hero" aria-labelledby="product-title">
-      <img class="product-backdrop" src="${product.screenshots[0]}" width="592" height="1052" alt="" aria-hidden="true">
       <div class="container product-hero-inner">
         ${breadcrumb(locale, product)}
-        <div class="product-identity">
-          <img class="product-hero-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon">
-          <div>
-            <p class="eyebrow">${content.category}</p>
-            <h1 id="product-title">${product.name}</h1>
+        <div class="product-hero-layout">
+          <div class="product-identity">
+            <div class="product-lockup">
+              <img class="product-hero-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon">
+              <div><p class="eyebrow">${content.category}</p><h1 id="product-title">${product.name}</h1></div>
+            </div>
             <p class="product-tagline">${content.tagline}</p>
             <p class="product-description">${content.description}</p>
-            <div class="button-row"><a class="button button-primary store-button" href="${storeUrl(product, locale)}" target="_blank" rel="noopener">${c.getPlay}<span aria-hidden="true">↗</span></a><a class="button button-ghost" href="${localizedPath(locale, "support")}?product=${product.slug}">${c.contact}</a></div>
+            <ul class="product-signals" aria-label="${esc(product.name)} ${isZh ? "产品特点" : "product highlights"}">${signals}</ul>
+            <div class="button-row product-actions">${googlePlayBadge(locale, product, "product")}<a class="button button-ghost" href="${localizedPath(locale, "support")}?product=${product.slug}">${c.contact}</a></div>
             <p class="package-name">${product.packageName}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section screenshots-section" aria-labelledby="screenshots-title">
-      <div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "真实应用界面" : "Inside the app"}</p><h2 id="screenshots-title">${c.screenshots}</h2></div><div class="screenshot-strip">${screenshots}</div></div>
+    <section class="section product-overview-section" aria-labelledby="overview-title">
+      <div class="container product-overview-layout">
+        <div class="overview-copy"><p class="eyebrow">${isZh ? "产品用途" : "Product purpose"}</p><h2 id="overview-title">${isZh ? `${product.name} 能帮你完成什么` : `What ${product.name} helps you do`}</h2>${overview}</div>
+        <aside class="product-fact-panel" aria-label="${isZh ? "产品信息" : "Product information"}">
+          <p class="eyebrow">${isZh ? "产品信息" : "Product facts"}</p>
+          <dl class="product-facts"><div><dt>${isZh ? "平台" : "Platform"}</dt><dd>Android</dd></div><div><dt>${isZh ? "类别" : "Category"}</dt><dd>${content.category}</dd></div><div><dt>${isZh ? "获取方式" : "Availability"}</dt><dd>Google Play</dd></div><div><dt>${isZh ? "开发者" : "Developer"}</dt><dd>${site.developer}</dd></div></dl>
+          <div class="product-audience-summary"><h3>${isZh ? "适合人群" : "Best for"}</h3><ul>${audienceNames}</ul></div>
+          <div class="product-trust"><h3>${isZh ? "数据与隐私边界" : "Data and privacy context"}</h3><p>${content.trust}</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section workflow-section" aria-labelledby="workflow-title">
+      <div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "使用流程" : "Workflow"}</p><h2 id="workflow-title">${isZh ? `使用 ${product.name} 完成一次任务` : `A clear path through ${product.name}`}</h2></div><ol class="workflow-grid">${workflow}</ol></div>
+    </section>
+
+    <section class="section use-case-section" aria-labelledby="use-cases-title">
+      <div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "实际应用" : "Practical scenarios"}</p><h2 id="use-cases-title">${isZh ? `${product.name} 的常见使用场景` : `Common use cases for ${product.name}`}</h2></div><div class="use-case-grid">${useCases}</div></div>
     </section>
 
     <section class="section feature-section" aria-labelledby="features-title">
@@ -501,7 +518,6 @@ ${header(locale, "products", alternatePath)}
     <section class="section related-section" aria-labelledby="related-title">
       <div class="container"><div class="section-heading"><p class="eyebrow">FlowTools</p><h2 id="related-title">${c.related}</h2></div><div class="related-grid">${related}</div></div>
     </section>
-    <dialog class="image-dialog" data-image-dialog><button class="dialog-close" type="button" aria-label="${isZh ? "关闭图片" : "Close image"}" title="${isZh ? "关闭" : "Close"}">×</button><img src="" alt=""></dialog>
   </main>
 ${footer(locale)}`;
 }
@@ -594,13 +610,14 @@ function aboutPage(locale) {
   const title = isZh ? "关于 FlowTools | AndroidManTou" : "About FlowTools | AndroidManTou";
   const description = isZh ? "了解 FlowTools、AndroidManTou 与上海促动科技有限公司。" : "Learn about FlowTools, AndroidManTou and Shanghai Cudong Technology Co., Ltd.";
   const schema = { "@context": "https://schema.org", "@type": "AboutPage", name: title, url: `${site.domain}${path}`, about: organizationSchema(locale) };
+  const portfolio = orderedProducts.map((product) => `<a class="portfolio-item" href="${localizedPath(locale, "product", product.slug)}"><img src="${product.icon}" width="512" height="512" alt="" loading="lazy"><span><strong>${product.name}</strong><small>${product[locale].category}</small><span>${product[locale].description}</span></span><span class="portfolio-arrow" aria-hidden="true">→</span></a>`).join("");
   return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [schema] })}
 ${header(locale, "about", alternatePath)}
   <main class="page-main" id="main-content">
-    ${pageIntro(locale, isZh ? "关于我们" : "About", isZh ? "独立开发，认真解决真实问题。" : "Independent software for real-world work.", isZh ? "FlowTools 是 AndroidManTou 打造的 Android 软件品牌。" : "FlowTools is the Android software brand built by AndroidManTou.")}
-    <section class="section"><div class="container about-layout"><div><p class="eyebrow">${isZh ? "我们的方向" : "What we build"}</p><h2>${isZh ? "面向专业工作与日常使用的 Android 工具。" : "Android tools for professional workflows and everyday use."}</h2></div><div class="prose"><p>${isZh ? "我们关注照片元数据、现场检查、现场摄影、离线 AI 和个人媒体管理等具体场景。每款应用都围绕明确的问题展开，并尽可能减少不必要的复杂度。" : "We focus on concrete needs across photo metadata, site inspection, field photography, offline AI and personal media. Each app starts with a defined problem and removes unnecessary complexity."}</p><p>${isZh ? "FlowTools 由上海促动科技有限公司运营，Google Play 开发者名称为 AndroidManTou。" : "FlowTools is operated by Shanghai Cudong Technology Co., Ltd. and publishes on Google Play under the developer name AndroidManTou."}</p></div></div></section>
-    <section class="section principles" aria-labelledby="process-title"><div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "我们的方式" : "How we work"}</p><h2 id="process-title">${isZh ? "从问题到可交付的产品。" : "From a real problem to a product people can use."}</h2></div><div class="principle-grid"><article><span>01</span><h3>${isZh ? "理解场景" : "Understand the situation"}</h3><p>${isZh ? "先明确用户在什么环境下工作、哪里浪费时间，以及什么结果才算完成。" : "We start with the environment, the friction and the outcome that actually matters."}</p></article><article><span>02</span><h3>${isZh ? "减少复杂度" : "Remove the noise"}</h3><p>${isZh ? "只保留能推动工作向前的功能，让产品在现场也足够清楚。" : "We keep the features that move the work forward and remove everything that gets in the way."}</p></article><article><span>03</span><h3>${isZh ? "持续维护" : "Keep improving"}</h3><p>${isZh ? "产品发布不是终点，我们根据真实使用持续修正和改进。" : "Shipping is not the finish line. Real use guides the next improvement."}</p></article></div></div></section>
-    <section class="company-band"><div class="container company-layout"><div><p class="eyebrow">${isZh ? "公司主体" : "Company"}</p><h2>${site.company[locale]}</h2></div><div><dl class="identity-list"><div><dt>${isZh ? "品牌" : "Brand"}</dt><dd>FlowTools</dd></div><div><dt>${isZh ? "开发者" : "Developer"}</dt><dd>${site.developer}</dd></div><div><dt>${isZh ? "地区" : "Region"}</dt><dd>${isZh ? "中国" : "China"}</dd></div><div><dt>${isZh ? "联系" : "Contact"}</dt><dd><a href="mailto:${site.email}">${site.email}</a></dd></div></dl></div></div></section>
+    ${pageIntro(locale, isZh ? "关于我们" : "About", isZh ? "为明确任务打造实用的 Android 工具。" : "Practical Android tools for defined tasks.", isZh ? "FlowTools 汇集 AndroidManTou 开发的专业工作与个人媒体应用。" : "FlowTools brings together professional workflow and personal media apps developed by AndroidManTou.")}
+    <section class="section"><div class="container about-layout"><div><p class="eyebrow">${isZh ? "我们的方向" : "What we build"}</p><h2>${isZh ? "每款 App 独立解决一个具体问题。" : "Each app addresses a distinct problem."}</h2></div><div class="prose"><p>${isZh ? "我们的产品覆盖照片元数据、现场摄影、检查报告、离线照片 AI 与个人音乐管理。每款 App 都有独立的产品页面、功能边界和获取入口，用户可以直接了解与自己任务相关的工具。" : "Our products cover photo metadata, field photography, inspection reports, offline photo AI and personal music management. Each app has its own product page, functional scope and installation path so people can evaluate the tool relevant to their work."}</p><p>${isZh ? "设计与开发围绕清晰的工作流程展开：减少与任务无关的界面，让数据处理方式和需要的权限更容易理解。产品能力与可用性以各自页面、应用内提示和 Google Play 信息为准。" : "Design and development follow clear workflows: reduce interface elements unrelated to the task and make data handling and required permissions easier to understand. Product capabilities and availability are described on each product page, in the app and on Google Play."}</p></div></div></section>
+    <section class="section portfolio-section" aria-labelledby="portfolio-title"><div class="container"><div class="section-heading"><p class="eyebrow">${isZh ? "产品组合" : "Product portfolio"}</p><h2 id="portfolio-title">${isZh ? "五款独立访问的 Android App" : "Five independently accessible Android apps"}</h2><p>${isZh ? "选择产品即可查看用途、工作流程、隐私边界和安装入口。" : "Choose a product to review its purpose, workflow, privacy context and installation link."}</p></div><div class="portfolio-list">${portfolio}</div></div></section>
+    <section class="company-band"><div class="container company-layout"><div><p class="eyebrow">${isZh ? "公司主体" : "Company"}</p><h2>${site.company[locale]}</h2></div><div><dl class="identity-list"><div><dt>${isZh ? "品牌" : "Brand"}</dt><dd>FlowTools</dd></div><div><dt>${isZh ? "开发者" : "Developer"}</dt><dd>${site.developer}</dd></div><div><dt>${isZh ? "地区" : "Region"}</dt><dd>${isZh ? "中国" : "China"}</dd></div><div><dt>${isZh ? "联系" : "Contact"}</dt><dd><a href="mailto:${site.email}">${site.email}</a></dd></div></dl><p class="company-note">${isZh ? "FlowTools 是产品品牌；AndroidManTou 是 Google Play 使用的开发者名称；上海促动科技有限公司是网站与品牌的运营主体。" : "FlowTools is the product brand, AndroidManTou is the developer name used on Google Play, and Shanghai Cudong Technology Co., Ltd. operates the website and brand."}</p></div></div></section>
   </main>
 ${footer(locale)}`;
 }
@@ -616,7 +633,7 @@ function supportPage(locale) {
 ${header(locale, "support", alternatePath)}
   <main class="page-main" id="main-content">
     ${pageIntro(locale, isZh ? "支持" : "Support", isZh ? "告诉我们发生了什么。" : "Tell us what happened.", isZh ? "我们为 FlowTools 产品的技术问题、购买、隐私请求和反馈提供支持。" : "We help with technical questions, purchases, privacy requests and feedback across FlowTools products.")}
-    <section class="section"><div class="container support-layout"><div class="contact-panel"><p class="eyebrow">${isZh ? "电子邮件" : "Email support"}</p><h2>${isZh ? "联系 FlowTools" : "Contact FlowTools"}</h2><div class="field-group"><label for="support-product">${isZh ? "产品" : "Product"}</label><select id="support-product" data-support-product><option value="FlowTools">FlowTools</option>${products.map((product) => `<option value="${product.name}" data-slug="${product.slug}">${product.name}</option>`).join("")}</select></div><a class="button button-primary support-email" href="mailto:${site.email}?subject=FlowTools%20Support" data-support-link>${isZh ? "发送邮件" : "Email support"}<span aria-hidden="true">↗</span></a><p class="contact-address">${site.email}</p></div><div class="support-notes"><article><span>01</span><h3>${isZh ? "说明产品和版本" : "Name the app and version"}</h3><p>${isZh ? "提供应用名称、版本号与 Android 版本。" : "Include the app name, app version and your Android version."}</p></article><article><span>02</span><h3>${isZh ? "描述复现步骤" : "Describe the steps"}</h3><p>${isZh ? "说明问题发生前执行的操作，以及你预期的结果。" : "Tell us what you did before the issue and what you expected to happen."}</p></article><article><span>03</span><h3>${isZh ? "保护私人内容" : "Protect private content"}</h3><p>${isZh ? "除非支持人员明确要求，请不要发送私人照片或文档。" : "Do not send private photos or documents unless support specifically requests them."}</p></article></div></div></section>
+    <section class="section"><div class="container support-layout"><div class="contact-panel"><p class="eyebrow">${isZh ? "电子邮件" : "Email support"}</p><h2>${isZh ? "联系 FlowTools" : "Contact FlowTools"}</h2><div class="field-group"><label for="support-product">${isZh ? "产品" : "Product"}</label><select id="support-product" data-support-product><option value="FlowTools">FlowTools</option>${orderedProducts.map((product) => `<option value="${product.name}" data-slug="${product.slug}">${product.name}</option>`).join("")}</select></div><a class="button button-primary support-email" href="mailto:${site.email}?subject=FlowTools%20Support" data-support-link>${isZh ? "发送邮件" : "Email support"}<span aria-hidden="true">↗</span></a><p class="contact-address">${site.email}</p></div><div class="support-notes"><article><span>01</span><h3>${isZh ? "说明产品和版本" : "Name the app and version"}</h3><p>${isZh ? "提供应用名称、版本号与 Android 版本。" : "Include the app name, app version and your Android version."}</p></article><article><span>02</span><h3>${isZh ? "描述复现步骤" : "Describe the steps"}</h3><p>${isZh ? "说明问题发生前执行的操作，以及你预期的结果。" : "Tell us what you did before the issue and what you expected to happen."}</p></article><article><span>03</span><h3>${isZh ? "保护私人内容" : "Protect private content"}</h3><p>${isZh ? "除非支持人员明确要求，请不要发送私人照片或文档。" : "Do not send private photos or documents unless support specifically requests them."}</p></article></div></div></section>
   </main>
 ${footer(locale)}`;
 }
@@ -627,7 +644,6 @@ function privacyPage(locale) {
   const alternatePath = localizedPath(isZh ? "en" : "zh", "privacy");
   const title = isZh ? "隐私政策 | FlowTools" : "Privacy Policy | FlowTools";
   const description = isZh ? "了解 FlowTools Android 应用如何处理照片、媒体、位置、检查记录和诊断信息。" : "Learn how FlowTools Android apps handle photos, media, location, inspection records and diagnostic information.";
-  const labels = isZh ? ["原则", "应用数据", "权限", "网络与分享", "保留与删除", "儿童隐私", "变更", "联系"] : ["Principles", "App data", "Permissions", "Network and sharing", "Retention and deletion", "Children", "Changes", "Contact"];
   const sections = isZh ? [
     ["principles", "我们的原则", "FlowTools 由上海促动科技有限公司运营。我们不会出售个人信息，也不会把你在应用中处理的内容用于广告画像。应用会尽可能减少不必要的数据传输，并在适合的功能中优先采用本地处理。"],
     ["data", "应用数据", "不同产品处理的数据取决于其功能，可能包括你选择的照片、音频文件、IPTC/EXIF/XMP 元数据、检查清单、报告内容、位置上下文或导出文件。具体处理行为应同时以相应应用的 Google Play“数据安全”说明和应用内提示为准。"],
@@ -647,11 +663,26 @@ function privacyPage(locale) {
     ["changes", "Changes to this policy", "We may update this policy when product features, legal requirements or data practices change. The date at the top of this page identifies the current version."],
     ["contact", "Contact", `For privacy questions or data requests, email <a href="mailto:${site.email}">${site.email}</a> and name the FlowTools product involved.`]
   ];
-  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: updated }] })}
+  const privacyRows = isZh ? [
+    ["sitereport", "SiteReport", "检查清单、照片证据、报告内容及可选位置", "相机、照片与媒体；启用定位时需要位置", "PDF 导出、分享或其他交付操作由用户发起"],
+    ["captionmeta", "CaptionMeta", "用户选择的照片及 IPTC、EXIF、XMP 元数据", "照片与媒体；使用拍摄功能时可能需要相机", "核心任务是读取或写入所选文件；交付或分享由用户发起"],
+    ["cloud-music", "Cloud Music", "设备音频文件、音乐库信息及用户选择的云端来源", "音乐与音频文件；兼容系统可能使用媒体或存储访问", "本地扫描留在设备端；打开云端来源时需要网络"],
+    ["geolens", "GeoLens", "照片、任务元数据及启用时的位置上下文", "相机、照片与媒体；启用位置功能时需要位置", "上传由用户发起，并发送到任务配置的服务器"],
+    ["pixora", "Pixora", "用户选择的照片及搜索或处理产生的结果", "照片与媒体", "核心流程以设备端处理为主；可选下载或外部功能会另行提示"]
+  ] : [
+    ["sitereport", "SiteReport", "Inspection checklists, photo evidence, report content and optional location", "Camera, photos and media; location when enabled", "PDF export, sharing and other delivery actions are user-initiated"],
+    ["captionmeta", "CaptionMeta", "Selected photos and their IPTC, EXIF and XMP metadata", "Photos and media; camera when capture is used", "Core work reads or writes selected files; delivery or sharing is user-initiated"],
+    ["cloud-music", "Cloud Music", "Device audio files, library information and a user-selected cloud source", "Music and audio; compatible systems may use media or storage access", "Local scanning stays on the device; network is used when a cloud source is opened"],
+    ["geolens", "GeoLens", "Photos, job metadata and optional location context", "Camera, photos and media; location when that feature is enabled", "Uploads are user-initiated and sent to the server configured for the job"],
+    ["pixora", "Pixora", "Selected photos and results produced by search or processing", "Photos and media", "Core workflows are designed for on-device processing; optional downloads or external features provide separate context"]
+  ];
+  const privacyMatrix = `<section id="app-context"><h2>${isZh ? "各应用的数据处理范围" : "Data context by app"}</h2><p>${isZh ? "下表用于解释功能可能涉及的数据与权限，不表示每项权限会在所有设备或所有使用场景中启用。Android 版本、已启用功能和系统文件选择器会影响实际权限请求。" : "This table explains data and permissions that may be relevant to a feature. It does not mean every permission is enabled on every device or in every workflow. Actual requests depend on the Android version, enabled feature and system file picker."}</p><div class="privacy-table-wrap"><table class="privacy-table"><thead><tr><th>App</th><th>${isZh ? "处理的内容" : "Content handled"}</th><th>${isZh ? "相关功能可能使用的权限" : "Permissions relevant to features"}</th><th>${isZh ? "联网、导出与分享" : "Network, export and sharing"}</th></tr></thead><tbody>${privacyRows.map(([slug, name, data, permissions, network]) => `<tr><th scope="row"><a href="${localizedPath(locale, "product", slug)}">${name}</a></th><td>${data}</td><td>${permissions}</td><td>${network}</td></tr>`).join("")}</tbody></table></div></section>`;
+  const navItems = sections.flatMap(([id, name], index) => index === 1 ? [[id, name], ["app-context", isZh ? "各应用说明" : "By app"]] : [[id, name]]);
+  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", schemas: [{ "@context": "https://schema.org", "@type": "WebPage", name: title, url: `${site.domain}${path}`, dateModified: privacyUpdated }] })}
 ${header(locale, "", alternatePath)}
   <main class="page-main" id="main-content">
     ${pageIntro(locale, isZh ? "隐私" : "Privacy", isZh ? "清楚说明数据如何参与工作。" : "Clear about how data supports the work.", updatedLabel(locale))}
-    <div class="container section legal-layout"><aside class="legal-nav" aria-label="${isZh ? "隐私政策章节" : "Privacy policy sections"}"><strong>${isZh ? "本页内容" : "On this page"}</strong>${sections.map((section, index) => `<a href="#${section[0]}">${labels[index]}</a>`).join("")}</aside><article class="prose legal-copy">${sections.map(([id, name, text]) => `<section id="${id}"><h2>${name}</h2><p>${text}</p></section>`).join("")}</article></div>
+    <div class="container section legal-layout"><aside class="legal-nav" aria-label="${isZh ? "隐私政策章节" : "Privacy policy sections"}"><strong>${isZh ? "本页内容" : "On this page"}</strong>${navItems.map(([id, name]) => `<a href="#${id}">${name}</a>`).join("")}</aside><article class="prose legal-copy">${sections.map(([id, name, text]) => `<section id="${id}"><h2>${name}</h2><p>${text}</p></section>${id === "data" ? privacyMatrix : ""}`).join("")}</article></div>
   </main>
 ${footer(locale)}`;
 }
@@ -689,7 +720,7 @@ const pages = [
   ["zh-cn/404.html", notFoundPage("zh")]
 ];
 
-for (const product of products) {
+for (const product of orderedProducts) {
   pages.push([`products/${product.slug}/index.html`, productPage("en", product)]);
   pages.push([`products/${product.slug}/privacy.html`, productPolicyPage("en", product)]);
   pages.push([`products/${product.slug}/terms.html`, productTermsPage("en", product)]);
@@ -704,7 +735,7 @@ for (const [path, content] of pages) await output(path, content);
 
 const sitemapPaths = ["home", "products", "about", "support", "privacy"];
 const sitemapEntries = sitemapPaths.map((type) => [localizedPath("en", type), localizedPath("zh", type)]);
-for (const product of products) sitemapEntries.push([localizedPath("en", "product", product.slug), localizedPath("zh", "product", product.slug)]);
+for (const product of orderedProducts) sitemapEntries.push([localizedPath("en", "product", product.slug), localizedPath("zh", "product", product.slug)]);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${sitemapEntries.flatMap(([en, zh]) => [[en, zh], [zh, en]]).map(([path, alternate]) => `  <url>
@@ -712,7 +743,7 @@ ${sitemapEntries.flatMap(([en, zh]) => [[en, zh], [zh, en]]).map(([path, alterna
     <xhtml:link rel="alternate" hreflang="${path.startsWith("/zh-cn") ? "zh-CN" : "en"}" href="${site.domain}${path}"/>
     <xhtml:link rel="alternate" hreflang="${path.startsWith("/zh-cn") ? "en" : "zh-CN"}" href="${site.domain}${alternate}"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="${site.domain}${path.startsWith("/zh-cn") ? alternate : path}"/>
-    <lastmod>${updated}</lastmod>
+    <lastmod>${siteUpdated}</lastmod>
   </url>`).join("\n")}
 </urlset>`;
 

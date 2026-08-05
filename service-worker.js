@@ -1,13 +1,16 @@
-const CACHE_NAME = "flowtools-v1";
+const CACHE_NAME = "flowtools-v16";
 const CORE_ASSETS = [
   "/",
   "/zh-cn/",
   "/css/styles.css",
+  "/css/product-pages.css",
   "/js/main.js",
   "/favicon.svg",
   "/manifest.json",
   "/assets/icons/icon-192.png",
-  "/assets/icons/icon-512.png"
+  "/assets/icons/icon-512.png",
+  "/assets/badges/google-play-en.png",
+  "/assets/badges/google-play-zh-cn.png"
 ];
 
 self.addEventListener("install", function (event) {
