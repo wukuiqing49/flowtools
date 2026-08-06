@@ -67,8 +67,10 @@ for (const file of htmlFiles) {
   if (/loading="(?:eager|lazy)>/.test(html)) errors.push(`${file}: malformed image loading attribute`);
   if (relativeFile === "index.html" || relativeFile === "zh-cn/index.html") {
     if (/class="hero-(?:app-grid|shot|media)/.test(html)) errors.push(`${file}: oversized homepage hero media returned`);
+    if ((html.match(/class="google-play-badge hero-play-badge"/g) || []).length !== 1) errors.push(`${file}: missing featured Google Play CTA`);
     if ((html.match(/class="google-play-badge card-play-badge"/g) || []).length !== 5) errors.push(`${file}: incomplete Google Play product badges`);
-    if ((html.match(/assets\/apps\/[a-z0-9-]+\/icon-192\.png/g) || []).length !== 5) errors.push(`${file}: incomplete optimized app icons`);
+    if ((html.match(/class="app-icon" src="\/assets\/apps\/[a-z0-9-]+\/icon-192\.png/g) || []).length !== 5) errors.push(`${file}: incomplete optimized app icons`);
+    if ((html.match(/<section class="section faq-section app-faq"[\s\S]*?<details>/g) || []).length !== 1 || (html.match(/<details>/g) || []).length !== 6) errors.push(`${file}: incomplete pre-install FAQ`);
     if (!/<div class="product-grid"><article class="product-card">[\s\S]*?assets\/apps\/sitereport\/icon-192\.png/.test(html)) errors.push(`${file}: SiteReport is not the first product`);
   }
   if (relativeFile === "about.html" || relativeFile === "zh-cn/about.html") {

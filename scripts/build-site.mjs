@@ -5,7 +5,7 @@ import { products, site, storeUrl } from "../site.config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const updated = "2026-08-05";
-const siteUpdated = "2026-08-05";
+const siteUpdated = "2026-08-06";
 const privacyUpdated = "2026-08-05";
 
 const copy = {
@@ -293,11 +293,11 @@ function homePage(locale) {
   const path = localizedPath(locale, "home");
   const alternatePath = localizedPath(isZh ? "en" : "zh", "home");
   const title = isZh
-    ? "上海促动科技有限公司 | Android 产品工作室 | FlowTools"
-    : "Shanghai Cudong Technology | Android Product Studio | FlowTools";
+    ? "FlowTools | 面向现场与照片工作的 Android 工具"
+    : "FlowTools | Android Tools for Field Work and Photos";
   const description = isZh
-    ? "上海促动科技有限公司旗下 FlowTools 产品工作室，打造现场检查、照片工作流、离线 AI、音乐管理等实用 Android 应用。"
-    : "FlowTools is the Android product studio of Shanghai Cudong Technology, building practical apps for field inspection, photo workflows, offline AI and music libraries.";
+    ? "FlowTools 提供面向现场检查、照片元数据、离线 AI 与音乐管理的 Android 应用，帮助你用更少步骤完成具体任务。"
+    : "FlowTools builds focused Android apps for field inspection, photo metadata, offline AI and music management, helping you finish specific tasks with fewer steps.";
   const listSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -309,46 +309,68 @@ function homePage(locale) {
       name: product.storeName
     }))
   };
-  const studioFaq = isZh ? [
-    ["上海促动科技有限公司做什么？", "上海促动科技有限公司是一家 Android 产品工作室，通过 FlowTools 品牌开发和维护面向现场工作、摄影、媒体与效率场景的实用软件。"],
-    ["FlowTools 有哪些产品？", "FlowTools 目前包含 SiteReport、CaptionMeta、GeoLens、Pixora 和 Cloud Music，分别面向现场检查、照片元数据、现场摄影、离线照片 AI 和音乐管理。"],
-    ["这些应用适合谁使用？", "产品面向需要清晰移动工作流的专业人员、现场团队、摄影工作者以及希望在本地处理媒体内容的 Android 用户。"],
-    ["在哪里可以获取 FlowTools 应用？", "各个产品页面都提供 Google Play 入口。具体功能、权限和数据处理方式以对应产品页面及 Google Play 说明为准。"]
+  const appFaq = isZh ? [
+    ["FlowTools 应用可以离线使用吗？", "多款应用支持离线或端侧核心工作流，包括 SiteReport 现场记录、CaptionMeta 元数据编辑、Pixora 照片 AI 与本地音乐播放。上传、分享、云端来源或模型下载等功能仍可能需要网络。"],
+    ["需要注册 FlowTools 账号吗？", "这些应用不共用一个必须注册的 FlowTools 账号。使用你主动选择的云端来源或外部服务时，对方可能要求登录。"],
+    ["应用免费吗？", "价格、免费功能与应用内购买可能随产品和地区不同。请在下载前查看对应 Google Play 页面上的当前价格与购买说明。"],
+    ["支持哪些 Android 版本？", "每款应用均通过 Google Play 提供 Android 版本。Google Play 会根据你的设备显示当前兼容性，具体要求以各应用的商店页面为准。"],
+    ["我的照片或工作数据会自动上传吗？", "核心工作流优先在设备上处理数据。只有当你主动使用上传、分享、云端来源或外部交付功能时，相关内容才可能发送到你选择的服务；请同时查看各产品隐私页与 Google Play 数据安全说明。"],
+    ["如何下载安装？", "选择下面的应用并点击对应的 Google Play 徽章，即可打开官方商店页面查看兼容性、价格、权限并安装。"]
   ] : [
-    ["What does Shanghai Cudong Technology do?", "Shanghai Cudong Technology is an Android product studio that builds and maintains practical software for field work, photography, media and productivity through the FlowTools brand."],
-    ["What products are in FlowTools?", "FlowTools currently includes SiteReport, CaptionMeta, GeoLens, Pixora and Cloud Music for site inspection, photo metadata, field photography, offline photo AI and music management."],
-    ["Who are these products for?", "The products are for professionals, field teams, photographers and Android users who need clear mobile workflows and local control over media content."],
-    ["Where can I get FlowTools apps?", "Each product page provides a Google Play link. Check the relevant product page and Google Play listing for current features, permissions and data practices."]
+    ["Can FlowTools apps work offline?", "Several apps support offline or on-device core workflows, including SiteReport field records, CaptionMeta metadata editing, Pixora photo AI and local music playback. Uploads, sharing, cloud sources or model downloads may still require a connection."],
+    ["Do I need a FlowTools account?", "The apps do not share a required FlowTools account. A cloud source or external service you choose to use may require its own sign-in."],
+    ["Are the apps free?", "Pricing, free features and in-app purchases may vary by product and region. Check the relevant Google Play listing for current pricing and purchase details before installing."],
+    ["Which Android versions are supported?", "Each app is distributed for Android through Google Play. Google Play shows current compatibility for your device; check the individual store listing for the latest requirements."],
+    ["Are my photos or work records uploaded automatically?", "Core workflows prioritize processing on the device. Content may be sent to a service you select only when you use an upload, sharing, cloud-source or external-delivery feature. Review each product privacy page and its Google Play Data safety disclosure."],
+    ["How do I install an app?", "Choose an app below and select its Google Play badge to open the official store listing, where you can review compatibility, pricing, permissions and install it."]
   ];
-  const studioFaqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: studioFaq.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) };
+  const appFaqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: appFaq.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) };
+  const homeDescriptions = isZh ? {
+    sitereport: "适用于巡检人员、施工与设施团队。通过清单完成检查，把照片证据和可选 GPS 与发现保持关联，最后生成可分享的 PDF 报告。",
+    captionmeta: "适用于摄影师与内容团队。在 Android 上批量编辑 IPTC、EXIF 与 XMP 信息，让照片在上传、交付或归档前更快整理到位。",
+    "cloud-music": "适用于管理个人曲库的用户。在一个简洁音乐库中浏览本地歌曲和自选云端来源，并让设备上的音乐保持离线可听。",
+    geolens: "适用于现场技术与拍摄团队。在照片中保留位置和结构化元数据，并把整理好的现场影像交付到指定工作流。",
+    pixora: "适用于照片较多、重视隐私的用户。通过端侧 AI 查找相似图片并完成常用照片处理，无需把整个图库交给远程搜索服务。"
+  } : {
+    sitereport: "For inspectors, contractors and facilities teams. Follow checklists, keep photos and optional GPS with each finding, then turn a site visit into a shareable PDF report.",
+    captionmeta: "For photographers and content teams. Batch-edit IPTC, EXIF and XMP details on Android so photos are organized sooner for upload, delivery or archive.",
+    "cloud-music": "For people who manage their own music collection. Browse local tracks and selected cloud sources in one focused library, with device music available offline.",
+    geolens: "For field technicians and photo teams. Keep location and structured metadata with each image, then deliver prepared field media into a configured workflow.",
+    pixora: "For large photo libraries and privacy-conscious users. Find similar images and use practical photo tools with on-device AI, without sending the full library to a remote search service."
+  };
+  const featuredProduct = orderedProducts[0];
   const cards = orderedProducts.map((product) => {
     const content = product[locale];
     return `<article class="product-card">
       <div class="product-card-top">
         <img class="app-icon" src="${product.icon}" width="512" height="512" alt="${esc(product.name)} app icon" loading="lazy">
-        ${googlePlayBadge(locale, product, "card")}
       </div>
       <p class="product-category">${content.category}</p>
       <h3>${product.name}</h3>
-      <p>${content.description}</p>
+      <p>${homeDescriptions[product.slug]}</p>
       <ul class="tag-list" aria-label="${esc(product.name)} ${isZh ? "功能" : "features"}">${content.tags.map((tag) => `<li>${tag}</li>`).join("")}</ul>
-      <a class="text-action" href="${localizedPath(locale, "product", product.slug)}">${c.viewProduct}<span aria-hidden="true">→</span></a>
+      <div class="product-card-actions"><a class="text-action" href="${localizedPath(locale, "product", product.slug)}">${c.viewProduct}<span aria-hidden="true">→</span></a>${googlePlayBadge(locale, product, "card")}</div>
     </article>`;
   }).join("\n");
-  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", imageAlt: isZh ? "FlowTools Android 产品工作室" : "FlowTools Android product studio", schemas: [organizationSchema(locale), websiteSchema(locale), listSchema, studioFaqSchema] })}
+  return `${head({ locale, title, description, path, alternatePath, image: "/assets/social/home.png", imageAlt: isZh ? "FlowTools Android 应用组合" : "FlowTools Android app portfolio", schemas: [organizationSchema(locale), websiteSchema(locale), listSchema, appFaqSchema] })}
 ${header(locale, "home", alternatePath)}
   <main id="main-content">
     <section class="home-hero" aria-labelledby="home-title">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow">${isZh ? "上海促动科技 · 产品工作室" : "Shanghai Cudong Technology · Product studio"}</p>
-          <h1 id="home-title">${isZh ? "为真实工作，打造更好的软件。" : "Software for real-world work."}</h1>
-          <p>${isZh ? "我们设计、开发并持续维护面向现场工作、摄影、媒体和效率场景的 Android 产品。少一点复杂，多一点真正有用。" : "We design, build and maintain Android products for field work, photography, media and everyday productivity. Less complexity. More of what is genuinely useful."}</p>
-          <div class="button-row">
-            <a class="button button-primary" href="#products">${isZh ? "查看我们的产品" : "Explore our work"}<span aria-hidden="true">→</span></a>
-            <a class="button button-ghost" href="${localizedPath(locale, "about")}">${isZh ? "了解公司" : "About the studio"}</a>
+          <p class="eyebrow">FlowTools · ${isZh ? "专注的 Android 应用" : "Focused Android apps"}</p>
+          <h1 id="home-title">${isZh ? "为真实工作而生的 Android 工具。" : "Android tools built for real work."}</h1>
+          <p>${isZh ? "从现场检查、照片元数据到离线 AI 与个人音乐，每款应用都专注一个明确任务，帮助你用更少步骤完成工作。" : "From field inspections and photo metadata to offline AI and personal music, each app focuses on a defined task and helps you finish it with fewer steps."}</p>
+          <div class="button-row hero-actions">
+            ${googlePlayBadge(locale, featuredProduct, "hero")}
+            <a class="button button-ghost" href="#products">${isZh ? "查看全部应用" : "View all apps"}<span aria-hidden="true">↓</span></a>
           </div>
-          <p class="hero-meta">${isZh ? "5 款已发布产品 · Android 原生 · 持续维护" : "5 published products · Android native · Actively maintained"}</p>
+          <p class="hero-meta">${isZh ? "5 款 Google Play 应用 · 支持离线工作流 · 持续维护" : "5 apps on Google Play · Offline-ready workflows · Actively maintained"}</p>
+        </div>
+        <div class="hero-product" aria-hidden="true">
+          <div class="hero-product-heading"><img src="${featuredProduct.icon}" width="192" height="192" alt=""><div><span>${isZh ? "主推应用" : "Featured app"}</span><strong>SiteReport</strong></div></div>
+          <p>${isZh ? "检查、取证、生成报告，一次现场任务完整交付。" : "Inspect, document and deliver a complete site report."}</p>
+          <div class="hero-screens"><img src="/assets/apps/sitereport/screen-1.webp" width="333" height="592" alt=""><img src="/assets/apps/sitereport/screen-3.webp" width="333" height="592" alt=""></div>
         </div>
       </div>
     </section>
@@ -356,11 +378,15 @@ ${header(locale, "home", alternatePath)}
     <section class="section products-section" id="products" aria-labelledby="products-title">
       <div class="container">
         <div class="section-heading heading-row">
-          <div><p class="eyebrow">${isZh ? "产品组合" : "Product portfolio"}</p><h2 id="products-title">${isZh ? "不同场景，同一种产品坚持。" : "Different needs. The same product discipline."}</h2></div>
-          <p>${isZh ? "从照片元数据到离线 AI，我们为每一个具体场景打造清晰、可靠、可以真正投入使用的 Android 工具。" : "From photo metadata to offline AI, we build clear and dependable Android tools for specific situations and real use."}</p>
+          <div><p class="eyebrow">${isZh ? "选择应用" : "Choose an app"}</p><h2 id="products-title">${isZh ? "找到适合当前任务的工具。" : "Find the right tool for the job."}</h2></div>
+          <p>${isZh ? "先看使用场景和结果，再进入产品页了解完整功能、隐私边界与 Google Play 安装信息。" : "Start with the situation and outcome, then open a product page for complete features, privacy details and Google Play installation."}</p>
         </div>
         <div class="product-grid">${cards}</div>
       </div>
+    </section>
+
+    <section class="section faq-section app-faq" aria-labelledby="app-faq-title">
+      <div class="container faq-layout"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="app-faq-title">${isZh ? "下载前，你可能想了解。" : "What to know before you install."}</h2><p>${isZh ? "具体价格、兼容性与权限以 Google Play 当前页面为准。" : "Current pricing, compatibility and permissions are shown on Google Play."}</p></div><div class="faq-list">${appFaq.map(([question, answer]) => `<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></div>
     </section>
 
     <section class="section principles" aria-labelledby="principles-title">
@@ -372,10 +398,6 @@ ${header(locale, "home", alternatePath)}
           <article><span>03</span><h3>${isZh ? "可交付" : "Ready to deliver"}</h3><p>${isZh ? "从元数据到 PDF，输出结果可以直接进入下一步工作。" : "From metadata to PDF, outputs are prepared for the next step."}</p></article>
         </div>
       </div>
-    </section>
-
-    <section class="section faq-section studio-faq" aria-labelledby="studio-faq-title">
-      <div class="container faq-layout"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="studio-faq-title">${isZh ? "关于上海促动科技与 FlowTools" : "About Shanghai Cudong Technology and FlowTools"}</h2></div><div class="faq-list">${studioFaq.map(([question, answer]) => `<details><summary>${question}</summary><p>${answer}</p></details>`).join("")}</div></div>
     </section>
 
     <section class="company-band" aria-labelledby="company-title">
@@ -401,7 +423,7 @@ function googlePlayBadge(locale, product, placement) {
   const isZh = locale === "zh";
   const asset = isZh ? "/assets/badges/google-play-zh-cn.png" : "/assets/badges/google-play-en.png";
   const label = isZh ? `在 Google Play 获取 ${product.name}` : `Get ${product.name} on Google Play`;
-  return `<a class="google-play-badge ${placement}-play-badge" href="${storeUrl(product, locale)}" target="_blank" rel="noopener" aria-label="${esc(label)}"><img src="${asset}" width="646" height="250" alt="${esc(label)}"${placement === "card" ? ' loading="lazy"' : ""}></a>`;
+  return `<a class="google-play-badge ${placement}-play-badge" href="${storeUrl(product, locale)}" target="_blank" rel="noopener" aria-label="${esc(label)}"><img src="${asset}" width="323" height="125" alt="${esc(label)}"${placement === "card" ? ' loading="lazy"' : ""}></a>`;
 }
 
 const relatedProductSlugs = {
